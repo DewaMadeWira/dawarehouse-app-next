@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model incoming_item_table {
+  incoming_item_id       Int             @id @default(autoincrement())
+  warehouse_id           Int
+  incoming_item_quantity Int
+  incoming_item_date     DateTime        @db.DateTime(0)
+  warehouse_table        warehouse_table @relation(fields: [warehouse_id], references: [warehouse_id], onUpdate: Restrict, map: "incoming_item_table_ibfk_1")
+
+  @@index([warehouse_id], map: "warehouse_id")
+}
+
+model item_table {
+  item_id         Int               @id @default(autoincrement())
+  item_name       String            @db.VarChar(255)
+  warehouse_table warehouse_table[]
+}
+
+model outgoing_item_table {
+  outgoing_item_id       Int             @id @default(autoincrement())
+  warehouse_id           Int
+  outgoing_item_quantity Int
+  outgoing_item_date     DateTime        @db.DateTime(0)
+  warehouse_table        warehouse_table @relation(fields: [warehouse_id], references: [warehouse_id], onUpdate: Restrict, map: "outgoing_item_table_ibfk_1")
+
+  @@index([warehouse_id], map: "warehouse_id")
+}
+
+model warehouse_table {
+  warehouse_id        Int                   @id @default(autoincrement())
+  warehouse_quantity  Int
+  item_id             Int
+  incoming_item_table incoming_item_table[]
+  outgoing_item_table outgoing_item_table[]
+  item_table          item_table            @relation(fields: [item_id], references: [item_id], onUpdate: Restrict, map: "warehouse_table_ibfk_1")
+
+  @@index([item_id], map: "item_id")
+}
