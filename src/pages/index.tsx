@@ -1,6 +1,8 @@
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import { Inter } from 'next/font/google';
 import { prisma } from '../../db/client';
+import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import type { InferGetStaticPropsType, GetStaticProps, NextPage } from 'next';
 import { Prisma } from '@prisma/client';
 
@@ -26,11 +28,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-
-type Item = {
-    item_id: string;
-    item: number;
-};
+import { json } from 'stream/consumers';
+import { revalidatePath } from 'next/cache';
 
 async function getItem() {
     const items = await prisma.item_table.findMany();
@@ -45,47 +44,21 @@ async function getWarehouse() {
     return warehouseItems;
 }
 
-// async function incomingItem(itemId: string, quantity: string) {
-//     await prisma.warehouse_table.create({
-//         data: {
-//             warehouse_quantity: +quantity,
-//             item_id: +itemId,
-//         },
-//     });
-
-//     const recentWarehouse = await prisma.warehouse_table.findFirstOrThrow({
-//         orderBy: {
-//             item_id: 'desc',
-//         },
-//     });
-
-//     await prisma.incoming_item_table.create({
-//         data: {
-//             warehouse_id: recentWarehouse?.warehouse_id,
-//             incoming_item_quantity: +recentWarehouse?.warehouse_quantity,
-//             incoming_item_date: Date.now().toString(),
-//         },
-//     });
-// }
-
 export const getStaticProps: GetStaticProps<{
     items: Prisma.PromiseReturnType<typeof getItem>;
     incomingItems: Prisma.PromiseReturnType<typeof getIncoming>;
     warehouseItems: Prisma.PromiseReturnType<typeof getWarehouse>;
 }> = async () => {
-
-
-
-    
     const items = await getItem();
     const incomingItems = await getIncoming();
     const warehouseItems = await getWarehouse();
     return {
         props: {
             items,
-            incomingItems,
+            incomingItems: JSON.parse(JSON.stringify(incomingItems)),
             warehouseItems,
         },
+        // revalidate: 1,
     };
 };
 
@@ -104,10 +77,36 @@ export const getStaticProps: GetStaticProps<{
 const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     props: InferGetStaticPropsType<typeof getStaticProps>
 ) => {
-    // const [inputState, setInputState] = useState('');
+    const router = useRouter();
+
+    const refreshData = () => {
+        router.replace(router.asPath);
+    };
+    const [itemState, setItemState] = useState('');
+    const [quantityState, setQuantityState] = useState('');
+
+    async function handleSubmit() {
+        // const userData = {
+        //     item: itemState,
+        //     quantity: quantityState,
+        // };
+        // alert(userData.item);
+
+        const res = await fetch('/api/incomingItem', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ item: itemState, quantity: quantityState }),
+        });
+
+        if (res.json != null) {
+            refreshData();
+        }
+    }
 
     return (
-        <main className='h-screen bg-bgBlack flex items-center flex-col justify-around'>
+        <main className='h-fit bg-bgBlack flex items-center flex-col justify-around'>
             <div className=' h-fit p-5 w-fit text-lg mt-5 bg-cardBlack border-bluePrimary border-2 rounded-lg'>
                 <h3 className='text-center font-outfit font-bold text-white '>
                     Items Table
@@ -170,7 +169,7 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                             {prop.incoming_item_quantity}
                                         </TableCell>
                                         <TableCell className=''>
-                                            {prop.incoming_item_date.toDateString()}
+                                            {prop.incoming_item_date?.toString()}
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -180,26 +179,38 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                     <div className='mt-12'>
                         <div className='flex justify-between'>
                             <Input
+                                name='quantity'
                                 className='bg-cardBlack '
                                 placeholder='Add incoming item'
-                                // onChange={(e) => setInputState(e.target.value)}
+                                onChange={(e) =>
+                                    setQuantityState(e.target.value)
+                                }
                                 type='number'
                             />
-                            <Select>
+                            <Select
+                                name='item'
+                                onValueChange={(e) => setItemState(e)}
+                            >
                                 <SelectTrigger className='w-[180px]'>
                                     <SelectValue placeholder='Theme' />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value='light'>Light</SelectItem>
-                                    <SelectItem value='dark'>Dark</SelectItem>
-                                    <SelectItem value='system'>
-                                        System
-                                    </SelectItem>
+                                    {props.items.map((prop) => (
+                                        <SelectItem
+                                            key={prop.item_id.toString()}
+                                            value={prop.item_id.toString()}
+                                        >
+                                            {prop.item_name}
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         </div>
 
-                        <Button className='text-white bg-bluePrimary font-outfit mt-10 hover:-translate-y-2 shadow-lg transition-all'>
+                        <Button
+                            onClick={() => handleSubmit()}
+                            className='text-white bg-bluePrimary font-outfit mt-10 hover:-translate-y-2 shadow-lg transition-all'
+                        >
                             Add Item
                         </Button>
                     </div>
