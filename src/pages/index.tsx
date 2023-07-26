@@ -28,6 +28,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+
+import { useToast } from '@/components/ui/use-toast';
+
 import { json } from 'stream/consumers';
 import { revalidatePath } from 'next/cache';
 
@@ -62,17 +65,7 @@ export const getStaticProps: GetStaticProps<{
     };
 };
 
-// const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
-//     props: InferGetStaticPropsType<typeof getStaticProps>
-// ) => {
-//     return (
-//         <div>
-//             {props.items.map((prop) => (
-//                 <p key={prop.item_id}>{prop.item_name}</p>
-//             ))}
-//         </div>
-//     );
-// };
+import { Toaster } from '@/components/ui/toaster';
 
 const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     props: InferGetStaticPropsType<typeof getStaticProps>
@@ -84,29 +77,46 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     };
     const [itemState, setItemState] = useState('');
     const [quantityState, setQuantityState] = useState('');
-
-    async function handleSubmit() {
-        // const userData = {
-        //     item: itemState,
-        //     quantity: quantityState,
-        // };
-        // alert(userData.item);
-
-        const res = await fetch('/api/incomingItem', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ item: itemState, quantity: quantityState }),
+    const { toast } = useToast();
+    function handleSubmit() {
+        console.log('error!');
+        toast({
+            description: 'Quantity cannot be 0 or negative (-1) !',
+            className: 'bg-yellow p-5 font-outfit border-none ',
         });
-
-        if (res.json != null) {
-            refreshData();
+        if (quantityState == '') {
+            console.log('quantitiy 0');
+            // alert('clicked');
+            // return;
         }
+        // if (itemState == null) {
+        //     // toast({
+        //     //     description: 'Please select an item !',
+        //     //     className: 'bg-yellow p-5 font-outfit border-none ',
+        //     //     variant: 'destructive',
+        //     // });
+        //     return;
+        // }
+
+        // const res = await fetch('/api/incomingItem', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({
+        //         item: itemState,
+        //         quantity: quantityState,
+        //     }),
+        // });
+
+        // if (res.json != null) {
+        //     refreshData();
+        // }
     }
 
     return (
-        <main className='h-fit bg-bgBlack flex items-center flex-col justify-around'>
+        // <Toaster />
+        <main className='min-h-screen bg-bgBlack flex items-center flex-col justify-around'>
             <div className=' h-fit p-5 w-fit text-lg mt-5 bg-cardBlack border-bluePrimary border-2 rounded-lg'>
                 <h3 className='text-center font-outfit font-bold text-white '>
                     Items Table
@@ -177,22 +187,24 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                         </Table>
                     </div>
                     <div className='mt-12'>
-                        <div className='flex justify-between'>
+                        <div className='flex justify-between w-full'>
                             <Input
                                 name='quantity'
-                                className='bg-cardBlack '
-                                placeholder='Add incoming item'
+                                className='bg-cardBlack w-1/4'
+                                placeholder='30'
                                 onChange={(e) =>
                                     setQuantityState(e.target.value)
                                 }
                                 type='number'
+                                required
                             />
                             <Select
                                 name='item'
                                 onValueChange={(e) => setItemState(e)}
+                                required
                             >
-                                <SelectTrigger className='w-[180px]'>
-                                    <SelectValue placeholder='Theme' />
+                                <SelectTrigger className='w-[180px] text-white'>
+                                    <SelectValue placeholder='Select Item' />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {props.items.map((prop) => (
@@ -206,7 +218,6 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                 </SelectContent>
                             </Select>
                         </div>
-
                         <Button
                             onClick={() => handleSubmit()}
                             className='text-white bg-bluePrimary font-outfit mt-10 hover:-translate-y-2 shadow-lg transition-all'

@@ -18,6 +18,9 @@ module.exports = {
             white: '#FFFFF8',
 
             gray: '#8B8B8B',
+
+            red: '#b91c1c',
+            yellow: '#fcd34d',
         },
         fontFamily: {
             outfit: ['Outfit', 'sans-serif'],

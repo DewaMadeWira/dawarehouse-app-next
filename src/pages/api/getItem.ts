@@ -2,16 +2,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../db/client';
 
-type Data = {
-    message: string;
-};
+// type Data = {
+//     message: string;
+// };
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<Data>
+    res: NextApiResponse
 ) {
     if (req.method === 'GET') {
         const recentWarehouse = await prisma.warehouse_table.findMany();
-        res.status(200);
+        res.send(recentWarehouse);
     }
 }
