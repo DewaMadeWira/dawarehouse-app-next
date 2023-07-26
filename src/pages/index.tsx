@@ -1,6 +1,4 @@
-import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { Inter } from 'next/font/google';
 import { prisma } from '../../db/client';
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import type { InferGetStaticPropsType, GetStaticProps, NextPage } from 'next';
@@ -31,8 +29,30 @@ import {
 
 import { useToast } from '@/components/ui/use-toast';
 
-import { json } from 'stream/consumers';
-import { revalidatePath } from 'next/cache';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+
+// import { json } from 'stream/consumers';
+// import { revalidatePath } from 'next/cache';
 
 async function getItem() {
     const items = await prisma.item_table.findMany();
@@ -78,44 +98,62 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     const [itemState, setItemState] = useState('');
     const [quantityState, setQuantityState] = useState('');
     const { toast } = useToast();
-    function handleSubmit() {
-        console.log('error!');
-        toast({
-            description: 'Quantity cannot be 0 or negative (-1) !',
-            className: 'bg-yellow p-5 font-outfit border-none ',
-        });
-        if (quantityState == '') {
-            console.log('quantitiy 0');
-            // alert('clicked');
-            // return;
+
+    // Handle Add Data
+
+    async function handleSubmit() {
+        if (quantityState == '' || quantityState == '0') {
+            console.log('quantity 0');
+            //
+            toast({
+                description: 'Quantity cannot be 0 or negative (-1) !',
+                className: 'bg-yellow p-5 font-outfit border-none ',
+            });
+            return;
         }
-        // if (itemState == null) {
-        //     // toast({
-        //     //     description: 'Please select an item !',
-        //     //     className: 'bg-yellow p-5 font-outfit border-none ',
-        //     //     variant: 'destructive',
-        //     // });
-        //     return;
-        // }
+        if (itemState == '') {
+            toast({
+                description: 'Please select an item !',
+                className: 'bg-yellow p-5 font-outfit border-none ',
+            });
+            return;
+        }
 
-        // const res = await fetch('/api/incomingItem', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({
-        //         item: itemState,
-        //         quantity: quantityState,
-        //     }),
-        // });
+        const res = await fetch('/api/incomingItem', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                item: itemState,
+                quantity: quantityState,
+            }),
+        });
 
-        // if (res.json != null) {
-        //     refreshData();
-        // }
+        if (res.json != null) {
+            refreshData();
+        }
+    }
+
+    // Handle Delete Data
+    async function handleDeleteIncoming(itemId: number, warehouseId: number) {
+        const res = await fetch('/api/deleteIncoming', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                itemId: itemId,
+                warehouseId: warehouseId,
+            }),
+        });
+
+        if (res.json != null) {
+            refreshData();
+        }
     }
 
     return (
-        // <Toaster />
         <main className='min-h-screen bg-bgBlack flex items-center flex-col justify-around'>
             <div className=' h-fit p-5 w-fit text-lg mt-5 bg-cardBlack border-bluePrimary border-2 rounded-lg'>
                 <h3 className='text-center font-outfit font-bold text-white '>
@@ -181,6 +219,115 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                         <TableCell className=''>
                                             {prop.incoming_item_date?.toString()}
                                         </TableCell>
+                                        <TableCell className=''>
+                                            <Dialog>
+                                                <DialogTrigger>
+                                                    <img
+                                                        className='hover:-translate-y-1 transition-all '
+                                                        width={20}
+                                                        height={20}
+                                                        src='edit_icon.png'
+                                                        alt='edit icon'
+                                                    />
+                                                </DialogTrigger>
+                                                <DialogContent>
+                                                    <DialogHeader>
+                                                        <DialogTitle>
+                                                            Edit quantity
+                                                            incoming item ID :{' '}
+                                                            {
+                                                                prop.incoming_item_id
+                                                            }
+                                                        </DialogTitle>
+                                                        <DialogDescription>
+                                                            This will also
+                                                            effect the quantity
+                                                            in{' '}
+                                                            <span className='font-bold'>
+                                                                Warehouse Table.
+                                                            </span>
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                    <div className='grid gap-4 py-4'>
+                                                        <div className='grid grid-cols-4 items-center gap-4'>
+                                                            <h5 className='text-right'>
+                                                                Quantity :
+                                                            </h5>
+                                                            <Input
+                                                                name='quantity'
+                                                                className='bg-cardBlack '
+                                                                placeholder='30'
+                                                                onChange={(e) =>
+                                                                    setQuantityState(
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                                type='number'
+                                                                min={0}
+                                                                required
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <DialogFooter>
+                                                        <Button className='bg-bluePrimary'>
+                                                            Save changes
+                                                        </Button>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
+                                        </TableCell>
+                                        <TableCell className=''>
+                                            <AlertDialog>
+                                                <AlertDialogTrigger>
+                                                    <img
+                                                        className='hover:-translate-y-1 transition-all '
+                                                        width={20}
+                                                        height={20}
+                                                        src='delete_icon.png'
+                                                        alt='delete icon'
+                                                    />
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent className='font-outfit bg-cardBlack text-white'>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle className=''>
+                                                            Are you sure to
+                                                            delete an delete an{' '}
+                                                            <span className='font-bold'>
+                                                                Incoming Item
+                                                            </span>{' '}
+                                                            ?
+                                                        </AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            This will make the
+                                                            item on the
+                                                            warehouse{' '}
+                                                            <span className='font-bold'>
+                                                                deleted
+                                                            </span>
+                                                            . Action cannot be
+                                                            undone.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel className='bg-bluePrimary'>
+                                                            Cancel
+                                                        </AlertDialogCancel>
+                                                        <AlertDialogAction
+                                                            className='bg-red text-white'
+                                                            onClick={() => {
+                                                                handleDeleteIncoming(
+                                                                    prop.incoming_item_id,
+                                                                    prop.warehouse_id
+                                                                );
+                                                            }}
+                                                        >
+                                                            Delete Item
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -196,6 +343,7 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                     setQuantityState(e.target.value)
                                 }
                                 type='number'
+                                min={0}
                                 required
                             />
                             <Select
