@@ -66,20 +66,27 @@ async function getWarehouse() {
     const warehouseItems = await prisma.warehouse_table.findMany();
     return warehouseItems;
 }
+async function getOutgoing() {
+    const outgoingItems = await prisma.outgoing_item_table.findMany();
+    return outgoingItems;
+}
 
 export const getStaticProps: GetStaticProps<{
     items: Prisma.PromiseReturnType<typeof getItem>;
     incomingItems: Prisma.PromiseReturnType<typeof getIncoming>;
     warehouseItems: Prisma.PromiseReturnType<typeof getWarehouse>;
+    outgoingItems: Prisma.PromiseReturnType<typeof getOutgoing>;
 }> = async () => {
     const items = await getItem();
     const incomingItems = await getIncoming();
     const warehouseItems = await getWarehouse();
+    const outgoingItems = await getOutgoing();
     return {
         props: {
             items,
             incomingItems: JSON.parse(JSON.stringify(incomingItems)),
             warehouseItems,
+            outgoingItems: JSON.parse(JSON.stringify(outgoingItems)),
         },
         // revalidate: 1,
     };
@@ -101,7 +108,7 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
 
     // Handle Add Data
 
-    async function handleSubmit() {
+    async function handleSubmit(isIncoming: boolean) {
         if (quantityState == '' || quantityState == '0') {
             console.log('quantity 0');
             //
@@ -119,23 +126,41 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
             return;
         }
 
-        const res = await fetch('/api/incomingItem', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                item: itemState,
-                quantity: quantityState,
-            }),
-        });
+        if (isIncoming) {
+            const res = await fetch('/api/incomingItem', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    item: itemState,
+                    quantity: quantityState,
+                }),
+            });
 
-        if (res.json != null) {
-            refreshData();
+            if (res.json != null) {
+                refreshData();
+            }
+        } else if (isIncoming == false) {
+            
+            const res = await fetch('/api/outgoingItem', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    item: itemState,
+                    quantity: quantityState,
+                }),
+            });
+
+            if (res.json != null) {
+                refreshData();
+            }
         }
     }
 
-    // Handle Delete Data
+    // Handle Delete Data Incoming
     async function handleDeleteIncoming(itemId: number, warehouseId: number) {
         const res = await fetch('/api/deleteIncoming', {
             method: 'POST',
@@ -145,6 +170,52 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
             body: JSON.stringify({
                 itemId: itemId,
                 warehouseId: warehouseId,
+            }),
+        });
+
+        if (res.json != null) {
+            refreshData();
+        }
+    }
+
+    // Handle Update Data Incoming WIP
+    async function handleUpdateIncoming(
+        itemId: number,
+        quantity: number,
+        warehouseId: number
+    ) {
+        const res = await fetch('/api/deleteIncoming', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                itemId: itemId,
+                warehouseId: warehouseId,
+                quantity: quantity,
+            }),
+        });
+
+        if (res.json != null) {
+            refreshData();
+        }
+    }
+
+    // Handle Update Data Outgoing
+    async function handleDeleteOutgoing(
+        itemId: number,
+        quantity: number,
+        warehouseId: number
+    ) {
+        const res = await fetch('/api/deleteOutgoing', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                itemId: itemId,
+                warehouseId: warehouseId,
+                quantity: quantity,
             }),
         });
 
@@ -181,9 +252,9 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                     </TableBody>
                 </Table>
             </div>
-            <div className='flex justify-around w-full'>
+            <div className='flex justify-between w-full p-10'>
                 {/* Incoming Item */}
-                <div>
+                <div className='p-5'>
                     <div className=' h-fit p-5 w-fit text-lg mt-5 bg-cardBlack border-bluePrimary border-2 rounded-lg'>
                         <h3 className='text-center font-outfit font-bold text-white '>
                             Incoming Items
@@ -367,7 +438,7 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                             </Select>
                         </div>
                         <Button
-                            onClick={() => handleSubmit()}
+                            onClick={() => handleSubmit(true)}
                             className='text-white bg-bluePrimary font-outfit mt-10 hover:-translate-y-2 shadow-lg transition-all'
                         >
                             Add Item
@@ -407,6 +478,198 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                             ))}
                         </TableBody>
                     </Table>
+                </div>
+                {/* Outgoing Item */}
+                <div className='p-5'>
+                    <div className=' h-fit p-5 w-fit text-lg mt-5 bg-cardBlack border-bluePrimary border-2 rounded-lg'>
+                        <h3 className='text-center font-outfit font-bold text-white '>
+                            Outgoing Items
+                        </h3>
+                        <Table className='text-white font-outfit'>
+                            <TableCaption>
+                                A list of all{' '}
+                                <span className='font-bold'>Incoming</span>{' '}
+                                items.
+                            </TableCaption>
+                            <TableHeader>
+                                <TableRow className='text-gray hover:bg-cardBlack'>
+                                    <TableHead className=''>ID</TableHead>
+                                    <TableHead className=''>
+                                        Warehouse ID
+                                    </TableHead>
+                                    <TableHead className=''>Quantity</TableHead>
+                                    <TableHead className=''>Date</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {props.outgoingItems.map((prop) => (
+                                    <TableRow key={prop.outgoing_item_id}>
+                                        <TableCell className=''>
+                                            {prop.outgoing_item_id}
+                                        </TableCell>
+                                        <TableCell className=''>
+                                            {prop.warehouse_id}
+                                        </TableCell>
+                                        <TableCell className=''>
+                                            {prop.outgoing_item_quantity}
+                                        </TableCell>
+                                        <TableCell className=''>
+                                            {prop.outgoing_item_date?.toString()}
+                                        </TableCell>
+                                        <TableCell className=''>
+                                            <Dialog>
+                                                <DialogTrigger>
+                                                    <img
+                                                        className='hover:-translate-y-1 transition-all '
+                                                        width={20}
+                                                        height={20}
+                                                        src='edit_icon.png'
+                                                        alt='edit icon'
+                                                    />
+                                                </DialogTrigger>
+                                                <DialogContent>
+                                                    <DialogHeader>
+                                                        <DialogTitle>
+                                                            Edit quantity
+                                                            incoming item ID :{' '}
+                                                            {
+                                                                prop.outgoing_item_id
+                                                            }
+                                                        </DialogTitle>
+                                                        <DialogDescription>
+                                                            This will also
+                                                            effect the quantity
+                                                            in{' '}
+                                                            <span className='font-bold'>
+                                                                Warehouse Table.
+                                                            </span>
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                    <div className='grid gap-4 py-4'>
+                                                        <div className='grid grid-cols-4 items-center gap-4'>
+                                                            <h5 className='text-right'>
+                                                                Quantity :
+                                                            </h5>
+                                                            <Input
+                                                                name='quantity'
+                                                                className='bg-cardBlack '
+                                                                placeholder='30'
+                                                                onChange={(e) =>
+                                                                    setQuantityState(
+                                                                        e.target
+                                                                            .value
+                                                                    )
+                                                                }
+                                                                type='number'
+                                                                min={0}
+                                                                required
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <DialogFooter>
+                                                        <Button className='bg-bluePrimary'>
+                                                            Save changes
+                                                        </Button>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
+                                        </TableCell>
+                                        <TableCell className=''>
+                                            <AlertDialog>
+                                                <AlertDialogTrigger>
+                                                    <img
+                                                        className='hover:-translate-y-1 transition-all '
+                                                        width={20}
+                                                        height={20}
+                                                        src='delete_icon.png'
+                                                        alt='delete icon'
+                                                    />
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent className='font-outfit bg-cardBlack text-white'>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle className=''>
+                                                            Are you sure to
+                                                            delete an delete an{' '}
+                                                            <span className='font-bold'>
+                                                                Incoming Item
+                                                            </span>{' '}
+                                                            ?
+                                                        </AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            This will make the
+                                                            item on the
+                                                            warehouse{' '}
+                                                            <span className='font-bold'>
+                                                                deleted
+                                                            </span>
+                                                            . Action cannot be
+                                                            undone.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel className='bg-bluePrimary'>
+                                                            Cancel
+                                                        </AlertDialogCancel>
+                                                        <AlertDialogAction
+                                                            className='bg-red text-white'
+                                                            onClick={() => {
+                                                                handleDeleteIncoming(
+                                                                    prop.outgoing_item_id,
+                                                                    prop.warehouse_id
+                                                                );
+                                                            }}
+                                                        >
+                                                            Delete Item
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                    <div className='mt-12'>
+                        <div className='flex justify-between w-full'>
+                            <Input
+                                name='quantity'
+                                className='bg-cardBlack w-1/4'
+                                placeholder='30'
+                                onChange={(e) =>
+                                    setQuantityState(e.target.value)
+                                }
+                                type='number'
+                                min={0}
+                                required
+                            />
+                            <Select
+                                name='item'
+                                onValueChange={(e) => setItemState(e)}
+                                required
+                            >
+                                <SelectTrigger className='w-[180px] text-white'>
+                                    <SelectValue placeholder='Select Item' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {props.warehouseItems.map((prop) => (
+                                        <SelectItem
+                                            key={prop.warehouse_id.toString()}
+                                            value={prop.warehouse_id.toString()}
+                                        >
+                                            {prop.warehouse_id}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <Button
+                            onClick={() => handleSubmit(false)}
+                            className='text-white bg-bluePrimary font-outfit mt-10 hover:-translate-y-2 shadow-lg transition-all'
+                        >
+                            Add Item
+                        </Button>
+                    </div>
                 </div>
             </div>
         </main>

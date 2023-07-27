@@ -11,34 +11,35 @@ export default async function handler(
     res: NextApiResponse
 ) {
     const itemId = req.body.itemId;
+    const quantity = req.body.quantity;
     const warehouseId = req.body.warehouseId;
     if (req.method === 'POST') {
-        await prisma.incoming_item_table.delete({
+        await prisma.incoming_item_table.update({
             where: {
                 incoming_item_id: itemId,
             },
-        });
-
-        const outgoingTable = await prisma.outgoing_item_table.findMany({
-            where: {
-                warehouse_id: warehouseId,
+            data: {
+                incoming_item_quantity: quantity,
             },
         });
 
-        if (outgoingTable != null) {
-            await prisma.outgoing_item_table.deleteMany({
-                where: {
-                    warehouse_id: warehouseId,
-                },
-            });
-        }
-        await prisma.warehouse_table.delete({
+        await prisma.warehouse_table.update({
             where: {
                 warehouse_id: warehouseId,
+            },
+            data: {
+                warehouse_quantity: quantity,
             },
         });
 
         await res.revalidate('/');
         return res.json({ revalidated: true });
+    } else {
+        const search = await prisma.item_table.findFirst({
+            where: {
+                item_id: 11,
+            },
+        });
+        res.json({ search });
     }
 }
