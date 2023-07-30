@@ -20,7 +20,12 @@ module.exports = {
             gray: '#8B8B8B',
 
             red: '#b91c1c',
+
             yellow: '#fcd34d',
+
+            green: '#2F7B40',
+
+            cardGray: '#222222',
         },
         fontFamily: {
             outfit: ['Outfit', 'sans-serif'],

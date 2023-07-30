@@ -5,14 +5,18 @@ import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 
 const Home = () => {
-    const [windowWidth, setWindowWidth] = useState(0);
+    const [windowWidth, setWindowWidth] = useState<number>(0);
 
     useEffect(() => {
-        console.log('window.innerWidth', window.innerWidth);
-
-        window.addEventListener('resize', () => {
+        function handleResize() {
+            // Set window width/height to state
             setWindowWidth(window.innerWidth);
-        });
+        }
+        window.addEventListener('resize', handleResize);
+
+        handleResize();
+
+        return () => window.removeEventListener('resize', handleResize);
     }, []);
 
     return (
@@ -23,7 +27,7 @@ const Home = () => {
                 // <h1>testing</h1>
                 <Navbar></Navbar>
             ) : (
-                <NavbarPhone></NavbarPhone>
+                <NavbarPhone isWarehouse={false}></NavbarPhone>
             )}
 
             <div className={`sm:flex sm:justify-between w-full items-center`}>
@@ -47,9 +51,6 @@ const Home = () => {
                 <div className='p-6'>
                     <div className='bg-cardBlack rounded-xl h-72 w-20'>.</div>
                 </div>
-            </div>
-            <div className='h-screen p-6'>
-                <h2>testing</h2>
             </div>
         </main>
     );

@@ -13,25 +13,36 @@ import {
     SheetTrigger,
 } from '@/components/ui/sheet';
 
-const NavbarPhone = () => {
+interface NavbarType {
+    isWarehouse: boolean;
+}
+
+const NavbarPhone = ({ isWarehouse }: NavbarType) => {
     return (
         <nav className='flex items-center justify-between p-6'>
             <Sheet>
                 <SheetTrigger>
                     <div className='flex items-center'>
                         <img src='/logo.png' alt='' />
-                        <h4 className='font-bold text-xl'>DaWarehouse</h4>
+                        {isWarehouse ? (
+                            <span></span>
+                        ) : (
+                            <h4 className='font-bold text-xl'>DaWarehouse</h4>
+                        )}
                     </div>
                 </SheetTrigger>
                 <SheetContent
                     side={'left'}
-                    className='bg-cardBlack text-white w-fit'
+                    className='bg-cardBlack text-white w-fit pr-10'
                 >
                     <SheetHeader>
                         <SheetDescription>
                             <div className='flex flex-col gap-10'>
                                 <img src='/logo.png' alt='' />
                                 <img src='/warehouse.png' alt='' />
+                                <img src='/incoming.png' alt='' />
+                                <img src='/outgoing.png' alt='' />
+                                <img src='/item.png' alt='' />
                             </div>
                         </SheetDescription>
                     </SheetHeader>
