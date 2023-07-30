@@ -31,6 +31,7 @@ export default async function handler(
         });
 
         await res.revalidate('/');
+        // res.redirect("/")
         return res.json({ revalidated: true });
     }
 }

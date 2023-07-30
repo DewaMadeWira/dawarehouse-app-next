@@ -92,8 +92,6 @@ export const getStaticProps: GetStaticProps<{
     };
 };
 
-import { Toaster } from '@/components/ui/toaster';
-
 const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     props: InferGetStaticPropsType<typeof getStaticProps>
 ) => {
@@ -142,7 +140,6 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                 refreshData();
             }
         } else if (isIncoming == false) {
-            
             const res = await fetch('/api/outgoingItem', {
                 method: 'POST',
                 headers: {
@@ -200,13 +197,27 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
             refreshData();
         }
     }
-
     // Handle Update Data Outgoing
-    async function handleDeleteOutgoing(
-        itemId: number,
-        quantity: number,
-        warehouseId: number
-    ) {
+    async function handleUpdateOutgoing(itemId: number, warehouseId: number) {
+        const res = await fetch('/api/updateOutgoing', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                itemId: itemId,
+                warehouseId: warehouseId,
+                quantity: quantityState,
+            }),
+        });
+
+        if (res.json != null) {
+            refreshData();
+        }
+    }
+
+    // Handle Delete Data Outgoing
+    async function handleDeleteOutgoing(itemId: number, warehouseId: number) {
         const res = await fetch('/api/deleteOutgoing', {
             method: 'POST',
             headers: {
@@ -215,7 +226,6 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
             body: JSON.stringify({
                 itemId: itemId,
                 warehouseId: warehouseId,
-                quantity: quantity,
             }),
         });
 
@@ -225,6 +235,7 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     }
 
     return (
+
         <main className='min-h-screen bg-bgBlack flex items-center flex-col justify-around'>
             <div className=' h-fit p-5 w-fit text-lg mt-5 bg-cardBlack border-bluePrimary border-2 rounded-lg'>
                 <h3 className='text-center font-outfit font-bold text-white '>
@@ -531,7 +542,7 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                     <DialogHeader>
                                                         <DialogTitle>
                                                             Edit quantity
-                                                            incoming item ID :{' '}
+                                                            Outgoing item ID :{' '}
                                                             {
                                                                 prop.outgoing_item_id
                                                             }
@@ -567,7 +578,15 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                         </div>
                                                     </div>
                                                     <DialogFooter>
-                                                        <Button className='bg-bluePrimary'>
+                                                        <Button
+                                                            className='bg-bluePrimary'
+                                                            onClick={() =>
+                                                                handleUpdateOutgoing(
+                                                                    prop.outgoing_item_id,
+                                                                    prop.warehouse_id
+                                                                )
+                                                            }
+                                                        >
                                                             Save changes
                                                         </Button>
                                                     </DialogFooter>
@@ -613,7 +632,7 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                         <AlertDialogAction
                                                             className='bg-red text-white'
                                                             onClick={() => {
-                                                                handleDeleteIncoming(
+                                                                handleDeleteOutgoing(
                                                                     prop.outgoing_item_id,
                                                                     prop.warehouse_id
                                                                 );
