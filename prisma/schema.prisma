@@ -20,6 +20,8 @@ model incoming_item_table {
 model item_table {
   item_id         Int               @id @default(autoincrement())
   item_name       String            @db.VarChar(255)
+  item_category   String            @db.VarChar(30)
+  item_price      Float
   warehouse_table warehouse_table[]
 }
 
@@ -37,6 +39,7 @@ model warehouse_table {
   warehouse_id        Int                   @id @default(autoincrement())
   warehouse_quantity  Int
   item_id             Int
+  status              String?               @default("In-stock") @db.VarChar(10)
   incoming_item_table incoming_item_table[]
   outgoing_item_table outgoing_item_table[]
   item_table          item_table            @relation(fields: [item_id], references: [item_id], onUpdate: Restrict, map: "warehouse_table_ibfk_1")

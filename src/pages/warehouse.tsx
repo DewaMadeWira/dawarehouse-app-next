@@ -24,10 +24,16 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
+import { Badge } from '@/components/ui/badge';
+
 import SidebarDesktop from '@/components/SidebarDesktop';
 
 async function getWarehouse() {
-    const warehouseItems = await prisma.warehouse_table.findMany();
+    const warehouseItems = await prisma.warehouse_table.findMany({
+        include: {
+            item_table: true,
+        },
+    });
     return warehouseItems;
 }
 
@@ -60,10 +66,35 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
 
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    function statusBadge(status: string | null) {
+        if (status == 'In-stock') {
+            return (
+                <Badge className='bg-green text-white border-none font-medium outline-none text-sm'>
+                    In-Stock
+                </Badge>
+            );
+        } else if (status == 'Need Restock') {
+            return (
+                <Badge className='bg-yellow  outline-none border-none font-medium text-sm'>
+                    Need Restock
+                </Badge>
+            );
+        } else {
+            return (
+                <Badge className='bg-red border-none outline-none font-medium text-sm'>
+                    Empty
+                </Badge>
+            );
+        }
+    }
+
     return (
         <main className='min-h-screen bg-bgBlack text-white font-outfit'>
+
             {windowWidth >= 700 ? (
                 <div>
+                
                     <Navbar isWarehouse={true}></Navbar>
                     <div className='flex justify-between pr-6'>
                         <SidebarDesktop></SidebarDesktop>
@@ -122,48 +153,123 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                     </div>
                                 </div>
                             </div>
+                            <div className='flex gap-5 mt-10 justify-end pr-10'>
+                                <Select>
+                                    <SelectTrigger className='w-fit border-bluePrimary'>
+                                        <SelectValue placeholder='Status' />
+                                    </SelectTrigger>
+                                    <SelectContent className='bg-cardBlack text-white font-outfit'>
+                                        <SelectItem value='light'>
+                                            Light
+                                        </SelectItem>
+                                        <SelectItem value='dark'>
+                                            Dark
+                                        </SelectItem>
+                                        <SelectItem value='system'>
+                                            System
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Select>
+                                    <SelectTrigger className='w-fit border-bluePrimary'>
+                                        <SelectValue placeholder='Item' />
+                                    </SelectTrigger>
+                                    <SelectContent className='bg-cardBlack text-white font-outfit'>
+                                        <SelectItem value='light'>
+                                            Light
+                                        </SelectItem>
+                                        <SelectItem value='dark'>
+                                            Dark
+                                        </SelectItem>
+                                        <SelectItem value='system'>
+                                            System
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Select>
+                                    <SelectTrigger className='w-fit border-bluePrimary'>
+                                        <SelectValue placeholder='Sort' />
+                                    </SelectTrigger>
+                                    <SelectContent className='bg-cardBlack text-white font-outfit'>
+                                        <SelectItem value='light'>
+                                            Light
+                                        </SelectItem>
+                                        <SelectItem value='dark'>
+                                            Dark
+                                        </SelectItem>
+                                        <SelectItem value='system'>
+                                            System
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                             {/* Warehouse */}
-                            <div className=' h-fit p-5 w-fit text-lg mt-5 bg-cardBlack border-bluePrimary border-2 rounded-lg'>
-                                <h3 className='text-center font-outfit font-bold text-white '>
-                                    Warehouse Items
-                                </h3>
-                                <Table className='text-white font-outfit'>
-                                    <TableCaption>
-                                        A list of all{' '}
-                                        <span className='font-bold'>
-                                            Warehouse
-                                        </span>{' '}
-                                        items.
-                                    </TableCaption>
-                                    <TableHeader>
-                                        <TableRow className='text-gray hover:bg-cardBlack'>
-                                            <TableHead className=''>
-                                                ID
-                                            </TableHead>
-                                            <TableHead className=''>
-                                                Quantity
-                                            </TableHead>
-                                            <TableHead className=''>
-                                                Item ID
-                                            </TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {props.warehouseItems.map((prop) => (
-                                            <TableRow key={prop.warehouse_id}>
-                                                <TableCell className=''>
-                                                    {prop.warehouse_id}
-                                                </TableCell>
-                                                <TableCell className=''>
-                                                    {prop.warehouse_quantity}
-                                                </TableCell>
-                                                <TableCell className=''>
-                                                    {prop.item_id}
-                                                </TableCell>
+                            <div className='px-6'>
+                                <div className=' h-fit p-5 text-lg mt-5 bg-cardBlack w-full  rounded-lg'>
+                                    <Table className='text-white font-outfit'>
+                                        <TableCaption>
+                                            {/* A list of all{' '}
+                                            <span className='font-bold'>
+                                                Warehouse
+                                            </span>{' '}
+                                            items. */}
+                                        </TableCaption>
+                                        <TableHeader>
+                                            <TableRow className='text-gray hover:bg-cardBlack'>
+                                                <TableHead className=''>
+                                                    ID
+                                                </TableHead>
+                                                <TableHead className=''>
+                                                    Item Name
+                                                </TableHead>
+                                                <TableHead className=''>
+                                                    Quantity
+                                                </TableHead>
+                                                <TableHead className=''>
+                                                    Category
+                                                </TableHead>
+                                                <TableHead className=''>
+                                                    Status
+                                                </TableHead>
                                             </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {props.warehouseItems.map(
+                                                (prop) => (
+                                                    <TableRow
+                                                        key={prop.warehouse_id}
+                                                    >
+                                                        <TableCell className=''>
+                                                            {prop.warehouse_id}
+                                                        </TableCell>
+                                                        <TableCell className=''>
+                                                            {
+                                                                prop.item_table
+                                                                    .item_name
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell className=''>
+                                                            {
+                                                                prop.warehouse_quantity
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell className=''>
+                                                            {
+                                                                prop.item_table
+                                                                    .item_category
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell className=''>
+                                                            {statusBadge(
+                                                                prop.status
+                                                            )}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -211,12 +317,14 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className='w-full mt-10'>
-                            <CardWarehouse
-                                name={'GTX 950'}
-                                quantity={'2'}
-                                status={'In Stock'}
-                            ></CardWarehouse>
+                        <div className='w-full mt-10 flex flex-col gap-7'>
+                            {props.warehouseItems.map((prop) => (
+                                <CardWarehouse
+                                    name={prop.item_table.item_name}
+                                    quantity={prop.warehouse_quantity.toString()}
+                                    status={prop.status?.toString()}
+                                ></CardWarehouse>
+                            ))}
                         </div>
                     </div>
                 </>

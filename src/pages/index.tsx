@@ -85,7 +85,7 @@ export const getStaticProps: GetStaticProps<{
         props: {
             items,
             incomingItems: JSON.parse(JSON.stringify(incomingItems)),
-            warehouseItems,
+            warehouseItems: JSON.parse(JSON.stringify(warehouseItems)),
             outgoingItems: JSON.parse(JSON.stringify(outgoingItems)),
         },
         // revalidate: 1,
@@ -235,7 +235,6 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     }
 
     return (
-
         <main className='min-h-screen bg-bgBlack flex items-center flex-col justify-around'>
             <div className=' h-fit p-5 w-fit text-lg mt-5 bg-cardBlack border-bluePrimary border-2 rounded-lg'>
                 <h3 className='text-center font-outfit font-bold text-white '>
