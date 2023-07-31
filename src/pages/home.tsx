@@ -21,16 +21,16 @@ const Home = () => {
 
     return (
         <main
-            className={`min-h-screen bg-bgBlack text-white font-outfit sm:p-12`}
+            className={`min-h-screen bg-bgBlack text-white font-outfit`}
         >
             {windowWidth >= 700 ? (
                 // <h1>testing</h1>
-                <Navbar></Navbar>
+                <Navbar isWarehouse={false}></Navbar>
             ) : (
                 <NavbarPhone isWarehouse={false}></NavbarPhone>
             )}
 
-            <div className={`sm:flex sm:justify-between w-full items-center`}>
+            <div className={`sm:flex sm:justify-between w-full items-center mt-16`}>
                 <div className='p-6 '>
                     <h1 className='text-5xl sm:text-7xl font-bold '>
                         DaWarehouse
