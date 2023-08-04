@@ -1,7 +1,6 @@
 import Navbar from '@/components/Navbar';
 import NavbarPhone from '@/components/NavbarPhone';
-import CardWarehouse from '@/components/CardWarehouse';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { InferGetStaticPropsType, GetStaticProps, NextPage } from 'next';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../db/client';
@@ -24,30 +23,80 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-import { Checkbox } from '@/components/ui/checkbox';
-
-import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import SidebarDesktop from '@/components/SidebarDesktop';
-import { empty } from '@prisma/client/runtime/library';
 
-async function getWarehouse() {
-    const warehouseItems = await prisma.warehouse_table.findMany({
+import TotalBar from '@/components/TotalBar';
+import SelectComponent from '@/components/SelectComponent';
+import StatusCheckBox from '@/components/StatusCheckbox';
+
+async function getIncomingItems() {
+    const incomingItems = await prisma.incoming_item_table.findMany({
         include: {
-            item_table: true,
+            warehouse_table: {
+                include: {
+                    item_table: true,
+                },
+            },
         },
     });
-    return warehouseItems;
+    return incomingItems;
+}
+
+async function getWarehouseSum() {
+    const data = await prisma.warehouse_table.aggregate({
+        _sum: {
+            warehouse_quantity: true,
+        },
+    });
+    return data;
+}
+async function getIncomingSum() {
+    const data = await prisma.incoming_item_table.aggregate({
+        _sum: {
+            incoming_item_quantity: true,
+        },
+    });
+    return data;
+}
+async function getOutgoingSum() {
+    const data = await prisma.outgoing_item_table.aggregate({
+        _sum: {
+            outgoing_item_quantity: true,
+        },
+    });
+    return data;
+}
+async function getItem() {
+    const data = await prisma.item_table.aggregate({
+        _count: {
+            _all: true,
+        },
+    });
+    return data;
 }
 
 export const getStaticProps: GetStaticProps<{
-    warehouseItems: Prisma.PromiseReturnType<typeof getWarehouse>;
+    incomingItems: Prisma.PromiseReturnType<typeof getIncomingItems>;
+    totalWarehouse: Prisma.PromiseReturnType<typeof getWarehouseSum>;
+    incomingSum: Prisma.PromiseReturnType<typeof getIncomingSum>;
+    outgoingItem: Prisma.PromiseReturnType<typeof getOutgoingSum>;
+    allItem: Prisma.PromiseReturnType<typeof getItem>;
 }> = async () => {
-    const warehouseItems = await getWarehouse();
+    const incomingItems = await getIncomingItems();
+    const totalWarehouse = await getWarehouseSum();
+    const incomingSum = await getIncomingSum();
+    const outgoingItem = await getOutgoingSum();
+    const allItem = await getItem();
 
     return {
         props: {
-            warehouseItems,
+            incomingItems: JSON.parse(JSON.stringify(incomingItems)),
+            totalWarehouse,
+            incomingSum,
+            outgoingItem,
+            allItem,
         },
         // revalidate: 1,
     };
@@ -65,7 +114,7 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     const [windowWidth, setWindowWidth] = useState<number>(700);
 
     const [data, setData] =
-        useState<Prisma.PromiseReturnType<typeof getWarehouse>>();
+        useState<Prisma.PromiseReturnType<typeof getIncomingItems>>();
 
     const [sortSelect, setSortSelect] = useState('ascending');
 
@@ -88,30 +137,8 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     }, []);
 
     useEffect(() => {
-        setData(props.warehouseItems);
+        setData(props.incomingItems);
     }, []);
-
-    function statusBadge(status: string | null) {
-        if (status == 'In-stock') {
-            return (
-                <Badge className='bg-green text-white border-none font-medium outline-none text-sm'>
-                    In-Stock
-                </Badge>
-            );
-        } else if (status == 'Need Restock') {
-            return (
-                <Badge className='bg-yellow  outline-none border-none font-medium text-sm'>
-                    Need Restock
-                </Badge>
-            );
-        } else {
-            return (
-                <Badge className='bg-red border-none outline-none font-medium text-sm'>
-                    Empty
-                </Badge>
-            );
-        }
-    }
 
     return (
         <main className='min-h-screen bg-bgBlack text-white font-outfit'>
@@ -123,146 +150,31 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                         {/* Main Screen */}
                         <div className='w-4/5 flex flex-col px-10'>
                             {/* Total Container */}
-                            <div className='flex justify-around'>
-                                <div className='bg-cardGray w-1/5 rounded-lg flex justify-between items-center p-3'>
-                                    <img
-                                        src='/warehouse.png'
-                                        className='w-8 h-8'
-                                        alt=''
-                                    />
-                                    <div>
-                                        <h5 className='text-gray'>Warehouse</h5>
-                                        <h4 className=''>14</h4>
-                                    </div>
-                                </div>
-                                <div className='bg-cardGray w-1/5 rounded-lg flex justify-between items-center p-3'>
-                                    <img
-                                        src='/incoming.png'
-                                        className='w-8 h-8'
-                                        alt=''
-                                    />
-                                    <div>
-                                        <h5 className='text-gray'>
-                                            Incoming Item
-                                        </h5>
-                                        <h4 className=''>14</h4>
-                                    </div>
-                                </div>
-                                <div className='bg-cardGray w-1/5 rounded-lg flex justify-between items-center p-3'>
-                                    <img
-                                        src='/outgoing.png'
-                                        className='w-8 h-8'
-                                        alt=''
-                                    />
-                                    <div>
-                                        <h5 className='text-gray'>
-                                            Outgoing item
-                                        </h5>
-                                        <h4 className=''>14</h4>
-                                    </div>
-                                </div>
-                                <div className='bg-cardGray w-1/5 rounded-lg flex justify-between items-center p-3'>
-                                    <img
-                                        src='/item.png'
-                                        className='w-8 h-8'
-                                        alt=''
-                                    />
-                                    <div>
-                                        <h5 className='text-gray'>
-                                            Total Item
-                                        </h5>
-                                        <h4 className=''>14</h4>
-                                    </div>
-                                </div>
-                            </div>
+                            <TotalBar
+                                warehouseSum={
+                                    props.totalWarehouse._sum.warehouse_quantity
+                                }
+                                incomingSum={
+                                    props.incomingSum._sum
+                                        .incoming_item_quantity
+                                }
+                                outgoingItem={
+                                    props.outgoingItem._sum
+                                        .outgoing_item_quantity
+                                }
+                                allItem={props.allItem._count._all}
+                            ></TotalBar>
                             {/* Select Container */}
                             <div className='flex gap-5 mt-10 justify-end pr-10'>
-                                <Select>
-                                    <SelectTrigger className='w-fit border-bluePrimary'>
-                                        <h4 className='mr-2'>Status</h4>
-                                    </SelectTrigger>
-                                    <SelectContent className='bg-cardBlack text-white font-outfit '>
-                                        <div className='flex flex-col items-start pl-2'>
-                                            <div className='flex justify-between items-start my-3 gap-2'>
-                                                <input
-                                                    onChange={(e) => {
-                                                        const obj = {
-                                                            ...statusCheckbox,
-                                                            inStock:
-                                                                e.target
-                                                                    .checked,
-                                                        };
-
-                                                        setStatusCheckbox(obj);
-                                                        // alert(e.target.checked);
-                                                    }}
-                                                    type='checkbox'
-                                                    id='instock'
-                                                    checked={
-                                                        statusCheckbox.inStock
-                                                    }
-                                                />
-                                                <label
-                                                    htmlFor='instock'
-                                                    className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-                                                >
-                                                    In-Stock
-                                                </label>
-                                            </div>
-                                            <div className='flex justify-between my-3 gap-2'>
-                                                <input
-                                                    onChange={(e) => {
-                                                        const obj = {
-                                                            ...statusCheckbox,
-                                                            needRestock:
-                                                                e.target
-                                                                    .checked,
-                                                        };
-
-                                                        setStatusCheckbox(obj);
-                                                        // alert(e.target.checked);
-                                                    }}
-                                                    type='checkbox'
-                                                    id='restock'
-                                                    checked={
-                                                        statusCheckbox.needRestock
-                                                    }
-                                                />
-                                                <label
-                                                    htmlFor='restock'
-                                                    className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-                                                >
-                                                    Need Restock
-                                                </label>
-                                            </div>
-                                            <div className='flex justify-between my-3 gap-2'>
-                                                <input
-                                                    onChange={(e) => {
-                                                        const obj = {
-                                                            ...statusCheckbox,
-                                                            empty: e.target
-                                                                .checked,
-                                                        };
-
-                                                        setStatusCheckbox(obj);
-                                                        // alert(e.target.checked);
-                                                    }}
-                                                    type='checkbox'
-                                                    id='empty'
-                                                    checked={
-                                                        statusCheckbox.empty
-                                                    }
-                                                />
-                                                <label
-                                                    htmlFor='empty'
-                                                    className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-                                                >
-                                                    Empty
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </SelectContent>
-                                </Select>
+                                <SelectComponent
+                                    data={data}
+                                    setData={setData}
+                                    setSortSelect={setSortSelect}
+                                />
+                                <StatusCheckBox
+                                    statusCheckbox={statusCheckbox}
+                                    setStatusCheckbox={setStatusCheckbox}
+                                />
                                 <Select
                                     onValueChange={(e) => {
                                         setSortSelect(e);
@@ -300,233 +212,90 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                     </SelectContent>
                                 </Select>
                             </div>
-                            {/* Warehouse */}
-                            <div className='px-6'>
-                                <div className=' h-fit p-5 text-lg mt-5 bg-cardBlack w-full  rounded-lg'>
-                                    <Table className='text-white font-outfit'>
-                                        <TableCaption>
-                                            {/* A list of all{' '}
+                            {/* Incoming Item */}
+                            <Tabs defaultValue='account' className='w-[400px]'>
+                                <TabsList>
+                                    <TabsTrigger value='account'>
+                                        Account
+                                    </TabsTrigger>
+                                    <TabsTrigger value='password'>
+                                        Password
+                                    </TabsTrigger>
+                                </TabsList>
+                                <TabsContent value='account'>
+                                    <div className='px-6'>
+                                        <div className=' h-fit p-5 text-lg mt-5 bg-cardBlack w-full  rounded-lg'>
+                                            <Table className='text-white font-outfit'>
+                                                <TableCaption>
+                                                    {/* A list of all{' '}
                                             <span className='font-bold'>
                                                 Warehouse
                                             </span>{' '}
                                             items. */}
-                                        </TableCaption>
-                                        <TableHeader>
-                                            <TableRow className='text-gray hover:bg-cardBlack'>
-                                                <TableHead className=''>
-                                                    ID
-                                                </TableHead>
-                                                <TableHead className=''>
-                                                    Item Name
-                                                </TableHead>
-                                                <TableHead className=''>
-                                                    Quantity
-                                                </TableHead>
-                                                <TableHead className=''>
-                                                    Category
-                                                </TableHead>
-                                                <TableHead className=''>
-                                                    Status
-                                                </TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {data
-                                                ?.filter((e) => {
-                                                    if (
-                                                        statusCheckbox.empty ==
-                                                            true &&
-                                                        statusCheckbox.inStock ==
-                                                            true &&
-                                                        statusCheckbox.needRestock ==
-                                                            true
-                                                    ) {
-                                                        return e;
-                                                    }
-
-                                                    if (
-                                                        statusCheckbox.empty &&
-                                                        statusCheckbox.inStock
-                                                    ) {
-                                                        return (
-                                                            e.status ==
-                                                                'Empty' ||
-                                                            e.status ==
-                                                                'In-stock'
-                                                        );
-                                                    }
-                                                    if (
-                                                        statusCheckbox.empty &&
-                                                        statusCheckbox.needRestock
-                                                    ) {
-                                                        return (
-                                                            e.status ==
-                                                                'Empty' ||
-                                                            e.status ==
-                                                                'Need Restock'
-                                                        );
-                                                    }
-                                                    if (
-                                                        statusCheckbox.inStock &&
-                                                        statusCheckbox.needRestock
-                                                    ) {
-                                                        return (
-                                                            e.status ==
-                                                                'In-stock' ||
-                                                            e.status ==
-                                                                'Need Restock'
-                                                        );
-                                                    }
-
-                                                    if (
-                                                        statusCheckbox.inStock
-                                                    ) {
-                                                        return (
-                                                            e.status ==
-                                                            'In-stock'
-                                                        );
-                                                    }
-                                                    if (
-                                                        statusCheckbox.needRestock
-                                                    ) {
-                                                        return (
-                                                            e.status ==
-                                                            'Need Restock'
-                                                        );
-                                                    }
-                                                    if (statusCheckbox.empty) {
-                                                        return (
-                                                            e.status == 'Empty'
-                                                        );
-                                                    }
-
-                                                    return;
-                                                })
-                                                .map((prop: any) => (
-                                                    <TableRow
-                                                        key={prop.warehouse_id}
-                                                    >
-                                                        <TableCell className=''>
-                                                            {prop.warehouse_id}
-                                                        </TableCell>
-                                                        <TableCell className=''>
-                                                            {
-                                                                prop.item_table
-                                                                    .item_name
-                                                            }
-                                                        </TableCell>
-                                                        <TableCell className=''>
-                                                            {
-                                                                prop.warehouse_quantity
-                                                            }
-                                                        </TableCell>
-                                                        <TableCell className=''>
-                                                            {
-                                                                prop.item_table
-                                                                    .item_category
-                                                            }
-                                                        </TableCell>
-                                                        <TableCell className=''>
-                                                            {statusBadge(
-                                                                prop.status
-                                                            )}
-                                                        </TableCell>
+                                                </TableCaption>
+                                                <TableHeader>
+                                                    <TableRow className='text-gray hover:bg-cardBlack'>
+                                                        <TableHead className=''>
+                                                            Incoming ID
+                                                        </TableHead>
+                                                        <TableHead className=''>
+                                                            Item Name
+                                                        </TableHead>
+                                                        <TableHead className=''>
+                                                            Warehouse ID
+                                                        </TableHead>
+                                                        <TableHead className=''>
+                                                            Quantity
+                                                        </TableHead>
+                                                        <TableHead className=''>
+                                                            Date
+                                                        </TableHead>
                                                     </TableRow>
-                                                ))}
-
-                                            {/* {sortSelect == 'descending'
-                                                ? props.warehouseItems
-                                                      .sort((a, b) => {
-                                                          return (
-                                                              b.warehouse_id -
-                                                              a.warehouse_id
-                                                          );
-                                                      })
-                                                      .map((prop) => (
-                                                          <TableRow
-                                                              key={
-                                                                  prop.warehouse_id
-                                                              }
-                                                          >
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop.warehouse_id
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop
-                                                                          .item_table
-                                                                          .item_name
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop.warehouse_quantity
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop
-                                                                          .item_table
-                                                                          .item_category
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {statusBadge(
-                                                                      prop.status
-                                                                  )}
-                                                              </TableCell>
-                                                          </TableRow>
-                                                      ))
-                                                : props.warehouseItems
-                                                      .sort((a, b) => {
-                                                          return (
-                                                              a.warehouse_id -
-                                                              b.warehouse_id
-                                                          );
-                                                      })
-                                                      .map((prop) => (
-                                                          <TableRow
-                                                              key={
-                                                                  prop.warehouse_id
-                                                              }
-                                                          >
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop.warehouse_id
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop
-                                                                          .item_table
-                                                                          .item_name
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop.warehouse_quantity
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop
-                                                                          .item_table
-                                                                          .item_category
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {statusBadge(
-                                                                      prop.status
-                                                                  )}
-                                                              </TableCell>
-                                                          </TableRow>
-                                                      ))} */}
-                                        </TableBody>
-                                    </Table>
-                                </div>
-                            </div>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {data?.map((prop) => (
+                                                        <TableRow
+                                                            key={
+                                                                prop.incoming_item_id
+                                                            }
+                                                        >
+                                                            <TableCell className=''>
+                                                                {
+                                                                    prop.incoming_item_id
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell className=''>
+                                                                {
+                                                                    prop
+                                                                        .warehouse_table
+                                                                        .item_table
+                                                                        .item_name
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell className=''>
+                                                                {
+                                                                    prop.warehouse_id
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell className=''>
+                                                                {
+                                                                    prop.incoming_item_quantity
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell className=''>
+                                                                {prop.incoming_item_date.toString()}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </div>
+                                    </div>
+                                </TabsContent>
+                                <TabsContent value='password'>
+                                    Change your password here.
+                                </TabsContent>
+                            </Tabs>
                         </div>
                     </div>
                 </div>
@@ -574,13 +343,13 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                             </Select>
                         </div>
                         <div className='w-full mt-10 flex flex-col gap-7'>
-                            {props.warehouseItems.map((prop) => (
+                            {/* {props.incomingItems.map((prop) => (
                                 <CardWarehouse
                                     name={prop.item_table.item_name}
                                     quantity={prop.warehouse_quantity.toString()}
                                     status={prop.status?.toString()}
                                 ></CardWarehouse>
-                            ))}
+                            ))} */}
                         </div>
                     </div>
                 </>

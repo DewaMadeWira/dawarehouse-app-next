@@ -13,9 +13,13 @@ export default async function handler(
     // const outgoingId = req.body.itemId;
     // const warehouseId = req.body.warehouseId;
     if (req.method === 'GET') {
-        const data = await prisma.item_table.aggregate({
-            _count: {
-                _all: true,
+        const data = await prisma.outgoing_item_table.findMany({
+            include: {
+                warehouse_table: {
+                    include: {
+                        item_table: true,
+                    },
+                },
             },
         });
 

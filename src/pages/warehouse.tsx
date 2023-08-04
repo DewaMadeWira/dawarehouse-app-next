@@ -35,7 +35,6 @@ import TotalBar from '@/components/TotalBar';
 import StatusCheckBox from '@/components/StatusCheckbox';
 import SelectComponent from '@/components/SelectComponent';
 
-
 async function getWarehouse() {
     const warehouseItems = await prisma.warehouse_table.findMany({
         include: {
@@ -93,17 +92,15 @@ export const getStaticProps: GetStaticProps<{
 
     return {
         props: {
-            path:[],
+            path: [],
             warehouseItems,
             totalWarehouse,
             incomingSum,
             outgoingItem,
             allItem,
-
         },
         // revalidate: 1,
     };
-    
 };
 
 interface StatusType {
@@ -196,11 +193,53 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                 }
                                 allItem={props.allItem._count._all}
                             ></TotalBar>
-                            {/* Select Container */} 
+                            {/* Select Container */}
                             <div className='flex gap-5 mt-10 justify-end pr-10'>
-                                <SelectComponent data={data} setSortSelect={setSortSelect} setData={setData}></SelectComponent>
-                                <StatusCheckBox statusCheckbox={statusCheckbox} setStatusCheckbox={setStatusCheckbox}/>
-                            
+                                <SelectComponent
+                                    data={data}
+                                    setData={setData}
+                                    setSortSelect={setSortSelect}
+                                />
+                                <StatusCheckBox
+                                    statusCheckbox={statusCheckbox}
+                                    setStatusCheckbox={setStatusCheckbox}
+                                />
+                                <Select
+                                    onValueChange={(e) => {
+                                        setSortSelect(e);
+                                        if (e == 'descending') {
+                                            setData(
+                                                data?.sort((a, b) => {
+                                                    return (
+                                                        b.warehouse_id -
+                                                        a.warehouse_id
+                                                    );
+                                                })
+                                            );
+                                        } else {
+                                            setData(
+                                                data?.sort((a, b) => {
+                                                    return (
+                                                        a.warehouse_id -
+                                                        b.warehouse_id
+                                                    );
+                                                })
+                                            );
+                                        }
+                                    }}
+                                >
+                                    <SelectTrigger className='w-fit border-bluePrimary'>
+                                        <SelectValue placeholder='Sort' />
+                                    </SelectTrigger>
+                                    <SelectContent className='bg-cardBlack text-white font-outfit'>
+                                        <SelectItem value='ascending'>
+                                            Ascending
+                                        </SelectItem>
+                                        <SelectItem value='descending'>
+                                            Descending
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
                             {/* Warehouse */}
                             <div className='px-6'>
