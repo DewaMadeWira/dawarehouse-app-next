@@ -24,18 +24,27 @@ const Navbar = ({ isWarehouse }: NavbarType) => {
                 </div>
             )}
 
-            <div className='w-1/2 lg:w-1/3 justify-between flex pr-8 py-5'>
-                <Link href={'/'}>
+            <div className='w-1/2 lg:w-1/3 justify-between flex pr-8 py-5  mb-2'>
+                <Link
+                    href={'/'}
+                    className='border-b-2 border-bgBlack hover:border-b-white transition-all '
+                >
                     <h5 className='text-lg'>Home</h5>
                 </Link>
 
                 <hr className=' border-gray' />
-                <Link href={'/warehouse'}>
+                <Link
+                    href={'/warehouse'}
+                    className='border-b-2 border-bgBlack hover:border-b-white transition-all '
+                >
                     <h5 className='text-lg'>Warehouse</h5>
                 </Link>
 
                 <hr className=' border-gray' />
-                <Link href={'/about'}>
+                <Link
+                    href={'/about'}
+                    className='border-b-2 border-bgBlack hover:border-b-white transition-all '
+                >
                     <h5 className='text-lg'>About</h5>
                 </Link>
             </div>

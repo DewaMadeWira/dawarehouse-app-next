@@ -5,7 +5,6 @@ import { useContext, useEffect, useState } from 'react';
 import type { InferGetStaticPropsType, GetStaticProps, NextPage } from 'next';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../db/client';
-import { useRouter } from 'next/router';
 
 import {
     Select,
@@ -31,10 +30,6 @@ import { Badge } from '@/components/ui/badge';
 
 import SidebarDesktop from '@/components/SidebarDesktop';
 import { empty } from '@prisma/client/runtime/library';
-import TotalBar from '@/components/TotalBar';
-import StatusCheckBox from '@/components/StatusCheckbox';
-import SelectComponent from '@/components/SelectComponent';
-
 
 async function getWarehouse() {
     const warehouseItems = await prisma.warehouse_table.findMany({
@@ -45,65 +40,17 @@ async function getWarehouse() {
     return warehouseItems;
 }
 
-async function getWarehouseSum() {
-    const data = await prisma.warehouse_table.aggregate({
-        _sum: {
-            warehouse_quantity: true,
-        },
-    });
-    return data;
-}
-async function getIncomingSum() {
-    const data = await prisma.incoming_item_table.aggregate({
-        _sum: {
-            incoming_item_quantity: true,
-        },
-    });
-    return data;
-}
-async function getOutgoingSum() {
-    const data = await prisma.outgoing_item_table.aggregate({
-        _sum: {
-            outgoing_item_quantity: true,
-        },
-    });
-    return data;
-}
-async function getItem() {
-    const data = await prisma.item_table.aggregate({
-        _count: {
-            _all: true,
-        },
-    });
-    return data;
-}
-
 export const getStaticProps: GetStaticProps<{
     warehouseItems: Prisma.PromiseReturnType<typeof getWarehouse>;
-    totalWarehouse: Prisma.PromiseReturnType<typeof getWarehouseSum>;
-    incomingSum: Prisma.PromiseReturnType<typeof getIncomingSum>;
-    outgoingItem: Prisma.PromiseReturnType<typeof getOutgoingSum>;
-    allItem: Prisma.PromiseReturnType<typeof getItem>;
 }> = async () => {
     const warehouseItems = await getWarehouse();
-    const totalWarehouse = await getWarehouseSum();
-    const incomingSum = await getIncomingSum();
-    const outgoingItem = await getOutgoingSum();
-    const allItem = await getItem();
 
     return {
         props: {
-            path:[],
             warehouseItems,
-            totalWarehouse,
-            incomingSum,
-            outgoingItem,
-            allItem,
-
         },
         // revalidate: 1,
     };
-    
 };
 
 interface StatusType {
@@ -112,11 +59,9 @@ interface StatusType {
     empty: boolean;
 }
 
-const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
+const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     props: InferGetStaticPropsType<typeof getStaticProps>
 ) => {
-    const router = useRouter();
-
     const [windowWidth, setWindowWidth] = useState<number>(700);
 
     const [data, setData] =
@@ -168,10 +113,6 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
         }
     }
 
-    if (router.isFallback) {
-        return <div>Loading...</div>;
-    }
-
     return (
         <main className='min-h-screen bg-bgBlack text-white font-outfit'>
             {windowWidth >= 700 ? (
@@ -182,25 +123,182 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                         {/* Main Screen */}
                         <div className='w-4/5 flex flex-col px-10'>
                             {/* Total Container */}
-                            <TotalBar
-                                warehouseSum={
-                                    props.totalWarehouse._sum.warehouse_quantity
-                                }
-                                incomingSum={
-                                    props.incomingSum._sum
-                                        .incoming_item_quantity
-                                }
-                                outgoingItem={
-                                    props.outgoingItem._sum
-                                        .outgoing_item_quantity
-                                }
-                                allItem={props.allItem._count._all}
-                            ></TotalBar>
-                            {/* Select Container */} 
+                            <div className='flex justify-around'>
+                                <div className='bg-cardGray w-1/5 rounded-lg flex justify-between items-center p-3'>
+                                    <img
+                                        src='/warehouse.png'
+                                        className='w-8 h-8'
+                                        alt=''
+                                    />
+                                    <div>
+                                        <h5 className='text-gray'>Warehouse</h5>
+                                        <h4 className=''>14</h4>
+                                    </div>
+                                </div>
+                                <div className='bg-cardGray w-1/5 rounded-lg flex justify-between items-center p-3'>
+                                    <img
+                                        src='/incoming.png'
+                                        className='w-8 h-8'
+                                        alt=''
+                                    />
+                                    <div>
+                                        <h5 className='text-gray'>
+                                            Incoming Item
+                                        </h5>
+                                        <h4 className=''>14</h4>
+                                    </div>
+                                </div>
+                                <div className='bg-cardGray w-1/5 rounded-lg flex justify-between items-center p-3'>
+                                    <img
+                                        src='/outgoing.png'
+                                        className='w-8 h-8'
+                                        alt=''
+                                    />
+                                    <div>
+                                        <h5 className='text-gray'>
+                                            Outgoing item
+                                        </h5>
+                                        <h4 className=''>14</h4>
+                                    </div>
+                                </div>
+                                <div className='bg-cardGray w-1/5 rounded-lg flex justify-between items-center p-3'>
+                                    <img
+                                        src='/item.png'
+                                        className='w-8 h-8'
+                                        alt=''
+                                    />
+                                    <div>
+                                        <h5 className='text-gray'>
+                                            Total Item
+                                        </h5>
+                                        <h4 className=''>14</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Select Container */}
                             <div className='flex gap-5 mt-10 justify-end pr-10'>
-                                <SelectComponent data={data} setSortSelect={setSortSelect} setData={setData}></SelectComponent>
-                                <StatusCheckBox statusCheckbox={statusCheckbox} setStatusCheckbox={setStatusCheckbox}/>
-                            
+                                <Select>
+                                    <SelectTrigger className='w-fit border-bluePrimary'>
+                                        <h4 className='mr-2'>Status</h4>
+                                    </SelectTrigger>
+                                    <SelectContent className='bg-cardBlack text-white font-outfit '>
+                                        <div className='flex flex-col items-start pl-2'>
+                                            <div className='flex justify-between items-start my-3 gap-2'>
+                                                <input
+                                                    onChange={(e) => {
+                                                        const obj = {
+                                                            ...statusCheckbox,
+                                                            inStock:
+                                                                e.target
+                                                                    .checked,
+                                                        };
+
+                                                        setStatusCheckbox(obj);
+                                                        // alert(e.target.checked);
+                                                    }}
+                                                    type='checkbox'
+                                                    id='instock'
+                                                    checked={
+                                                        statusCheckbox.inStock
+                                                    }
+                                                />
+                                                <label
+                                                    htmlFor='instock'
+                                                    className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+                                                >
+                                                    In-Stock
+                                                </label>
+                                            </div>
+                                            <div className='flex justify-between my-3 gap-2'>
+                                                <input
+                                                    onChange={(e) => {
+                                                        const obj = {
+                                                            ...statusCheckbox,
+                                                            needRestock:
+                                                                e.target
+                                                                    .checked,
+                                                        };
+
+                                                        setStatusCheckbox(obj);
+                                                        // alert(e.target.checked);
+                                                    }}
+                                                    type='checkbox'
+                                                    id='restock'
+                                                    checked={
+                                                        statusCheckbox.needRestock
+                                                    }
+                                                />
+                                                <label
+                                                    htmlFor='restock'
+                                                    className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+                                                >
+                                                    Need Restock
+                                                </label>
+                                            </div>
+                                            <div className='flex justify-between my-3 gap-2'>
+                                                <input
+                                                    onChange={(e) => {
+                                                        const obj = {
+                                                            ...statusCheckbox,
+                                                            empty: e.target
+                                                                .checked,
+                                                        };
+
+                                                        setStatusCheckbox(obj);
+                                                        // alert(e.target.checked);
+                                                    }}
+                                                    type='checkbox'
+                                                    id='empty'
+                                                    checked={
+                                                        statusCheckbox.empty
+                                                    }
+                                                />
+                                                <label
+                                                    htmlFor='empty'
+                                                    className='text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+                                                >
+                                                    Empty
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </SelectContent>
+                                </Select>
+                                <Select
+                                    onValueChange={(e) => {
+                                        setSortSelect(e);
+                                        if (e == 'descending') {
+                                            setData(
+                                                data?.sort((a, b) => {
+                                                    return (
+                                                        b.warehouse_id -
+                                                        a.warehouse_id
+                                                    );
+                                                })
+                                            );
+                                        } else {
+                                            setData(
+                                                data?.sort((a, b) => {
+                                                    return (
+                                                        a.warehouse_id -
+                                                        b.warehouse_id
+                                                    );
+                                                })
+                                            );
+                                        }
+                                    }}
+                                >
+                                    <SelectTrigger className='w-fit border-bluePrimary'>
+                                        <SelectValue placeholder='Sort' />
+                                    </SelectTrigger>
+                                    <SelectContent className='bg-cardBlack text-white font-outfit'>
+                                        <SelectItem value='ascending'>
+                                            Ascending
+                                        </SelectItem>
+                                        <SelectItem value='descending'>
+                                            Descending
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
                             {/* Warehouse */}
                             <div className='px-6'>
@@ -491,4 +589,4 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     );
 };
 
-export default Warehouse;
+export default Incoming;
