@@ -1,12 +1,13 @@
 import Navbar from '@/components/Navbar';
 import NavbarPhone from '@/components/NavbarPhone';
 import CardWarehouse from '@/components/CardWarehouse';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { InferGetStaticPropsType, GetStaticProps, NextPage } from 'next';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../db/client';
 import { useRouter } from 'next/router';
 
+import { motion } from 'framer-motion';
 import {
     Select,
     SelectContent,
@@ -25,12 +26,9 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-import { Checkbox } from '@/components/ui/checkbox';
-
 import { Badge } from '@/components/ui/badge';
 
 import SidebarDesktop from '@/components/SidebarDesktop';
-import { empty } from '@prisma/client/runtime/library';
 import TotalBar from '@/components/TotalBar';
 import StatusCheckBox from '@/components/StatusCheckbox';
 import SelectComponent from '@/components/SelectComponent';
@@ -170,7 +168,7 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     }
 
     return (
-        <main className='min-h-screen bg-bgBlack text-white font-outfit'>
+        <div className='min-h-screen bg-bgBlack text-white font-outfit'>
             {windowWidth >= 700 ? (
                 <div>
                     <Navbar isWarehouse={true}></Navbar>
@@ -199,183 +197,167 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                     data={data}
                                     setData={setData}
                                     setSortSelect={setSortSelect}
+                                    dataType='warehouse'
                                 />
                                 <StatusCheckBox
                                     statusCheckbox={statusCheckbox}
                                     setStatusCheckbox={setStatusCheckbox}
                                 />
-                                <Select
-                                    onValueChange={(e) => {
-                                        setSortSelect(e);
-                                        if (e == 'descending') {
-                                            setData(
-                                                data?.sort((a, b) => {
-                                                    return (
-                                                        b.warehouse_id -
-                                                        a.warehouse_id
-                                                    );
-                                                })
-                                            );
-                                        } else {
-                                            setData(
-                                                data?.sort((a, b) => {
-                                                    return (
-                                                        a.warehouse_id -
-                                                        b.warehouse_id
-                                                    );
-                                                })
-                                            );
-                                        }
-                                    }}
-                                >
-                                    <SelectTrigger className='w-fit border-bluePrimary'>
-                                        <SelectValue placeholder='Sort' />
-                                    </SelectTrigger>
-                                    <SelectContent className='bg-cardBlack text-white font-outfit'>
-                                        <SelectItem value='ascending'>
-                                            Ascending
-                                        </SelectItem>
-                                        <SelectItem value='descending'>
-                                            Descending
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
                             </div>
                             {/* Warehouse */}
                             <div className='px-6'>
                                 <div className=' h-fit p-5 text-lg mt-5 bg-cardBlack w-full  rounded-lg'>
-                                    <Table className='text-white font-outfit'>
-                                        <TableCaption>
-                                            {/* A list of all{' '}
+                                    <motion.div
+                                        initial={{
+                                            opacity: 0,
+                                            y: 100,
+                                        }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 1 }}
+                                    >
+                                        <Table className='text-white font-outfit'>
+                                            <TableCaption>
+                                                {/* A list of all{' '}
                                             <span className='font-bold'>
                                                 Warehouse
                                             </span>{' '}
                                             items. */}
-                                        </TableCaption>
-                                        <TableHeader>
-                                            <TableRow className='text-gray hover:bg-cardBlack'>
-                                                <TableHead className=''>
-                                                    ID
-                                                </TableHead>
-                                                <TableHead className=''>
-                                                    Item Name
-                                                </TableHead>
-                                                <TableHead className=''>
-                                                    Quantity
-                                                </TableHead>
-                                                <TableHead className=''>
-                                                    Category
-                                                </TableHead>
-                                                <TableHead className=''>
-                                                    Status
-                                                </TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {data
-                                                ?.filter((e) => {
-                                                    if (
-                                                        statusCheckbox.empty ==
-                                                            true &&
-                                                        statusCheckbox.inStock ==
-                                                            true &&
-                                                        statusCheckbox.needRestock ==
-                                                            true
-                                                    ) {
-                                                        return e;
-                                                    }
+                                            </TableCaption>
+                                            <TableHeader>
+                                                <TableRow className='text-gray hover:bg-cardBlack'>
+                                                    <TableHead className=''>
+                                                        ID
+                                                    </TableHead>
+                                                    <TableHead className=''>
+                                                        Item Name
+                                                    </TableHead>
+                                                    <TableHead className=''>
+                                                        Quantity
+                                                    </TableHead>
+                                                    <TableHead className=''>
+                                                        Category
+                                                    </TableHead>
+                                                    <TableHead className=''>
+                                                        Status
+                                                    </TableHead>
+                                                </TableRow>
+                                            </TableHeader>
 
-                                                    if (
-                                                        statusCheckbox.empty &&
-                                                        statusCheckbox.inStock
-                                                    ) {
-                                                        return (
-                                                            e.status ==
-                                                                'Empty' ||
-                                                            e.status ==
+                                            <TableBody>
+                                                {data
+                                                    ?.filter((e) => {
+                                                        if (
+                                                            statusCheckbox.empty ==
+                                                                true &&
+                                                            statusCheckbox.inStock ==
+                                                                true &&
+                                                            statusCheckbox.needRestock ==
+                                                                true
+                                                        ) {
+                                                            return e;
+                                                        }
+
+                                                        if (
+                                                            statusCheckbox.empty &&
+                                                            statusCheckbox.inStock
+                                                        ) {
+                                                            return (
+                                                                e.status ==
+                                                                    'Empty' ||
+                                                                e.status ==
+                                                                    'In-stock'
+                                                            );
+                                                        }
+                                                        if (
+                                                            statusCheckbox.empty &&
+                                                            statusCheckbox.needRestock
+                                                        ) {
+                                                            return (
+                                                                e.status ==
+                                                                    'Empty' ||
+                                                                e.status ==
+                                                                    'Need Restock'
+                                                            );
+                                                        }
+                                                        if (
+                                                            statusCheckbox.inStock &&
+                                                            statusCheckbox.needRestock
+                                                        ) {
+                                                            return (
+                                                                e.status ==
+                                                                    'In-stock' ||
+                                                                e.status ==
+                                                                    'Need Restock'
+                                                            );
+                                                        }
+
+                                                        if (
+                                                            statusCheckbox.inStock
+                                                        ) {
+                                                            return (
+                                                                e.status ==
                                                                 'In-stock'
-                                                        );
-                                                    }
-                                                    if (
-                                                        statusCheckbox.empty &&
-                                                        statusCheckbox.needRestock
-                                                    ) {
-                                                        return (
-                                                            e.status ==
-                                                                'Empty' ||
-                                                            e.status ==
+                                                            );
+                                                        }
+                                                        if (
+                                                            statusCheckbox.needRestock
+                                                        ) {
+                                                            return (
+                                                                e.status ==
                                                                 'Need Restock'
-                                                        );
-                                                    }
-                                                    if (
-                                                        statusCheckbox.inStock &&
-                                                        statusCheckbox.needRestock
-                                                    ) {
-                                                        return (
-                                                            e.status ==
-                                                                'In-stock' ||
-                                                            e.status ==
-                                                                'Need Restock'
-                                                        );
-                                                    }
+                                                            );
+                                                        }
+                                                        if (
+                                                            statusCheckbox.empty
+                                                        ) {
+                                                            return (
+                                                                e.status ==
+                                                                'Empty'
+                                                            );
+                                                        }
 
-                                                    if (
-                                                        statusCheckbox.inStock
-                                                    ) {
-                                                        return (
-                                                            e.status ==
-                                                            'In-stock'
-                                                        );
-                                                    }
-                                                    if (
-                                                        statusCheckbox.needRestock
-                                                    ) {
-                                                        return (
-                                                            e.status ==
-                                                            'Need Restock'
-                                                        );
-                                                    }
-                                                    if (statusCheckbox.empty) {
-                                                        return (
-                                                            e.status == 'Empty'
-                                                        );
-                                                    }
+                                                        return;
+                                                    })
 
-                                                    return;
-                                                })
-                                                .map((prop: any) => (
-                                                    <TableRow
-                                                        key={prop.warehouse_id}
-                                                    >
-                                                        <TableCell className=''>
-                                                            {prop.warehouse_id}
-                                                        </TableCell>
-                                                        <TableCell className=''>
-                                                            {
-                                                                prop.item_table
-                                                                    .item_name
+                                                    .map((prop: any) => (
+                                                        <TableRow
+                                                            key={
+                                                                prop.warehouse_id
                                                             }
-                                                        </TableCell>
-                                                        <TableCell className=''>
-                                                            {
-                                                                prop.warehouse_quantity
-                                                            }
-                                                        </TableCell>
-                                                        <TableCell className=''>
-                                                            {
-                                                                prop.item_table
-                                                                    .item_category
-                                                            }
-                                                        </TableCell>
-                                                        <TableCell className=''>
-                                                            {statusBadge(
-                                                                prop.status
-                                                            )}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
+                                                        >
+                                                            <TableCell className=''>
+                                                                {
+                                                                    prop.warehouse_id
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell className=''>
+                                                                {
+                                                                    prop
+                                                                        .item_table
+                                                                        .item_name
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell className=''>
+                                                                {
+                                                                    prop.warehouse_quantity
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell className=''>
+                                                                {
+                                                                    prop
+                                                                        .item_table
+                                                                        .item_category
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell className=''>
+                                                                {statusBadge(
+                                                                    prop.status
+                                                                )}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
 
-                                            {/* {sortSelect == 'descending'
+                                                {/* {sortSelect == 'descending'
                                                 ? props.warehouseItems
                                                       .sort((a, b) => {
                                                           return (
@@ -464,8 +446,9 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                               </TableCell>
                                                           </TableRow>
                                                       ))} */}
-                                        </TableBody>
-                                    </Table>
+                                            </TableBody>
+                                        </Table>
+                                    </motion.div>
                                 </div>
                             </div>
                         </div>
@@ -526,7 +509,7 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                     </div>
                 </>
             )}
-        </main>
+        </div>
     );
 };
 

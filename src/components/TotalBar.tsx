@@ -1,3 +1,5 @@
+import { motion } from 'framer-motion';
+
 interface TotalBarType {
     warehouseSum: number | null;
     incomingSum: number | null;
@@ -12,7 +14,12 @@ const TotalBar = ({
     allItem,
 }: TotalBarType) => {
     return (
-        <div className='flex justify-around'>
+        <motion.div
+            initial={{ opacity: 0, y: -100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+            className='flex justify-around'
+        >
             <div className='bg-cardGray w-1/5 rounded-lg flex justify-between items-center p-3'>
                 <img src='/warehouse.png' className='w-8 h-8' alt='' />
                 <div>
@@ -41,7 +48,7 @@ const TotalBar = ({
                     <h4 className=''>{allItem}</h4>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

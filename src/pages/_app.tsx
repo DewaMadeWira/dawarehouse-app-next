@@ -19,23 +19,10 @@ export default function App({ Component, pageProps }: AppProps) {
                 <motion.div
                     className='bg-bgBlack'
                     key={router.route}
-                    transition={{
-                        duration: 0.3,
-                    }}
-                    initial='initialState'
-                    animate='animateState'
-                    exit='exitState'
-                    variants={{
-                        initialState: {
-                            backgroundColor: '#171717',
-                            opacity: 0,
-                        },
-                        animateState: {
-                            backgroundColor: '#171717',
-                            opacity: 1,
-                        },
-                        exitState: { backgroundColor: '#171717' },
-                    }}
+                    initial={{  backgroundColor: '#171717', opacity: 0 }}
+                    animate={{ backgroundColor: '#171717', opacity: 1 }}
+                    exit={{  opacity: 0, backgroundColor: '#171717' }}
+                    transition={{ delay: 0.3 }}
                 >
                     <Component {...pageProps} />
                     <Toaster />

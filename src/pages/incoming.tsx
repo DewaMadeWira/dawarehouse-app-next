@@ -29,7 +29,17 @@ import SidebarDesktop from '@/components/SidebarDesktop';
 
 import TotalBar from '@/components/TotalBar';
 import SelectComponent from '@/components/SelectComponent';
-import StatusCheckBox from '@/components/StatusCheckbox';
+
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 async function getIncomingItems() {
     const incomingItems = await prisma.incoming_item_table.findMany({
@@ -170,50 +180,15 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                     data={data}
                                     setData={setData}
                                     setSortSelect={setSortSelect}
+                                    dataType='incoming'
                                 />
-                                <StatusCheckBox
+                                {/* <StatusCheckBox
                                     statusCheckbox={statusCheckbox}
                                     setStatusCheckbox={setStatusCheckbox}
-                                />
-                                <Select
-                                    onValueChange={(e) => {
-                                        setSortSelect(e);
-                                        if (e == 'descending') {
-                                            setData(
-                                                data?.sort((a, b) => {
-                                                    return (
-                                                        b.warehouse_id -
-                                                        a.warehouse_id
-                                                    );
-                                                })
-                                            );
-                                        } else {
-                                            setData(
-                                                data?.sort((a, b) => {
-                                                    return (
-                                                        a.warehouse_id -
-                                                        b.warehouse_id
-                                                    );
-                                                })
-                                            );
-                                        }
-                                    }}
-                                >
-                                    <SelectTrigger className='w-fit border-bluePrimary'>
-                                        <SelectValue placeholder='Sort' />
-                                    </SelectTrigger>
-                                    <SelectContent className='bg-cardBlack text-white font-outfit'>
-                                        <SelectItem value='ascending'>
-                                            Ascending
-                                        </SelectItem>
-                                        <SelectItem value='descending'>
-                                            Descending
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                /> */}
                             </div>
                             {/* Incoming Item */}
-                            <Tabs defaultValue='account' className='w-[400px]'>
+                            <Tabs defaultValue='account' className='w-full'>
                                 <TabsList>
                                     <TabsTrigger value='account'>
                                         Account
@@ -284,6 +259,136 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                             </TableCell>
                                                             <TableCell className=''>
                                                                 {prop.incoming_item_date.toString()}
+                                                            </TableCell>
+                                                            <TableCell className=''>
+                                                                <Dialog>
+                                                                    <DialogTrigger
+                                                                        asChild
+                                                                    >
+                                                                        <img
+                                                                            src='/edit_icon.png'
+                                                                            alt=''
+                                                                        />
+                                                                    </DialogTrigger>
+                                                                    <DialogContent className='sm:max-w-[425px]'>
+                                                                        <DialogHeader>
+                                                                            <DialogTitle>
+                                                                                Edit
+                                                                                profile
+                                                                            </DialogTitle>
+                                                                            <DialogDescription>
+                                                                                Make
+                                                                                changes
+                                                                                to
+                                                                                your
+                                                                                profile
+                                                                                here.
+                                                                                Click
+                                                                                save
+                                                                                when
+                                                                                you're
+                                                                                done.
+                                                                            </DialogDescription>
+                                                                        </DialogHeader>
+                                                                        <div className='grid gap-4 py-4 text-bgBlack'>
+                                                                            <div className='grid grid-cols-4 items-center gap-4'>
+                                                                                <label
+                                                                                    htmlFor='name'
+                                                                                    className='text-right'
+                                                                                >
+                                                                                    Name
+                                                                                </label>
+                                                                                <input
+                                                                                    id='name'
+                                                                                    className='col-span-3'
+                                                                                />
+                                                                            </div>
+                                                                            <div className='grid grid-cols-4 items-center gap-4'>
+                                                                                <label
+                                                                                    htmlFor='username'
+                                                                                    className='text-right'
+                                                                                >
+                                                                                    Username
+                                                                                </label>
+                                                                                <input
+                                                                                    id='username'
+                                                                                    className='col-span-3'
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+                                                                        <DialogFooter>
+                                                                            <Button type='submit'>
+                                                                                Save
+                                                                                changes
+                                                                            </Button>
+                                                                        </DialogFooter>
+                                                                    </DialogContent>
+                                                                </Dialog>
+                                                            </TableCell>
+                                                            <TableCell className=''>
+                                                                <Dialog>
+                                                                    <DialogTrigger
+                                                                        asChild
+                                                                    >
+                                                                        <img width={25}
+                                                                            src='/delete_icon.png'
+                                                                            alt=''
+                                                                        />
+                                                                    </DialogTrigger>
+                                                                    <DialogContent className='sm:max-w-[425px]'>
+                                                                        <DialogHeader>
+                                                                            <DialogTitle>
+                                                                                Edit
+                                                                                profile
+                                                                            </DialogTitle>
+                                                                            <DialogDescription>
+                                                                                Make
+                                                                                changes
+                                                                                to
+                                                                                your
+                                                                                profile
+                                                                                here.
+                                                                                Click
+                                                                                save
+                                                                                when
+                                                                                you're
+                                                                                done.
+                                                                            </DialogDescription>
+                                                                        </DialogHeader>
+                                                                        <div className='grid gap-4 py-4 text-bgBlack'>
+                                                                            <div className='grid grid-cols-4 items-center gap-4'>
+                                                                                <label
+                                                                                    htmlFor='name'
+                                                                                    className='text-right'
+                                                                                >
+                                                                                    Name
+                                                                                </label>
+                                                                                <input
+                                                                                    id='name'
+                                                                                    className='col-span-3'
+                                                                                />
+                                                                            </div>
+                                                                            <div className='grid grid-cols-4 items-center gap-4'>
+                                                                                <label
+                                                                                    htmlFor='username'
+                                                                                    className='text-right'
+                                                                                >
+                                                                                    Username
+                                                                                </label>
+                                                                                <input
+                                                                                    id='username'
+                                                                                    className='col-span-3'
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+                                                                        <DialogFooter>
+                                                                            <Button type='submit'>
+                                                                                Save
+                                                                                changes
+                                                                            </Button>
+                                                                        </DialogFooter>
+                                                                    </DialogContent>
+                                                                </Dialog>
                                                             </TableCell>
                                                         </TableRow>
                                                     ))}

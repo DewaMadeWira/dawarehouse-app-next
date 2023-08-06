@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { NavbarContext } from '@/context/NavbarContext';
 import { useRouter } from 'next/router';
+import { motion } from 'framer-motion';
 
 const SidebarDesktop = () => {
     const { navbarValue, setNavbarValue } = useContext(NavbarContext);
@@ -11,7 +12,12 @@ const SidebarDesktop = () => {
     }
 
     return (
-        <div className='bg-cardBlack w-1/5 pt-8 h-screen flex flex-col gap-4 px-3'>
+        <motion.div
+            initial={{ opacity: 0, x: -100 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1 }}
+            className='bg-cardBlack w-1/5 pt-8 h-screen flex flex-col gap-4 px-3'
+        >
             {/* Warehouse */}
             <button
                 onClick={() => {
@@ -63,7 +69,7 @@ const SidebarDesktop = () => {
                 <img src='/item.png' width={35} alt='' />
                 <h4 className='text-lg'>Item</h4>
             </button>
-        </div>
+        </motion.div>
     );
 };
 
