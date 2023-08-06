@@ -4,6 +4,8 @@ import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import type { InferGetStaticPropsType, GetStaticProps, NextPage } from 'next';
 import { Prisma } from '@prisma/client';
 
+import { ScrollArea } from '@/components/ui/scroll-area';
+
 import {
     Table,
     TableBody,
@@ -435,15 +437,18 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                 <SelectTrigger className='w-[180px] text-white'>
                                     <SelectValue placeholder='Select Item' />
                                 </SelectTrigger>
+
                                 <SelectContent>
-                                    {props.items.map((prop) => (
-                                        <SelectItem
-                                            key={prop.item_id.toString()}
-                                            value={prop.item_id.toString()}
-                                        >
-                                            {prop.item_name}
-                                        </SelectItem>
-                                    ))}
+                                    <ScrollArea className='h-40'>
+                                        {props.items.map((prop) => (
+                                            <SelectItem
+                                                key={prop.item_id.toString()}
+                                                value={prop.item_id.toString()}
+                                            >
+                                                {prop.item_name}
+                                            </SelectItem>
+                                        ))}
+                                    </ScrollArea>
                                 </SelectContent>
                             </Select>
                         </div>

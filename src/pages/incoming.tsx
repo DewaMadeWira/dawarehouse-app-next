@@ -5,6 +5,10 @@ import type { InferGetStaticPropsType, GetStaticProps, NextPage } from 'next';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../db/client';
 
+import { motion } from 'framer-motion';
+
+import { ScrollArea } from '@/components/ui/scroll-area';
+
 import {
     Select,
     SelectContent,
@@ -12,6 +16,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+
+import { Input } from '@/components/ui/input';
 
 import {
     Table,
@@ -54,6 +60,11 @@ async function getIncomingItems() {
     return incomingItems;
 }
 
+async function getAllItem() {
+    const items = await prisma.item_table.findMany();
+    return items;
+}
+
 async function getWarehouseSum() {
     const data = await prisma.warehouse_table.aggregate({
         _sum: {
@@ -93,12 +104,14 @@ export const getStaticProps: GetStaticProps<{
     incomingSum: Prisma.PromiseReturnType<typeof getIncomingSum>;
     outgoingItem: Prisma.PromiseReturnType<typeof getOutgoingSum>;
     allItem: Prisma.PromiseReturnType<typeof getItem>;
+    items: Prisma.PromiseReturnType<typeof getAllItem>;
 }> = async () => {
     const incomingItems = await getIncomingItems();
     const totalWarehouse = await getWarehouseSum();
     const incomingSum = await getIncomingSum();
     const outgoingItem = await getOutgoingSum();
     const allItem = await getItem();
+    const items = await getAllItem();
 
     return {
         props: {
@@ -107,6 +120,7 @@ export const getStaticProps: GetStaticProps<{
             incomingSum,
             outgoingItem,
             allItem,
+            items,
         },
         // revalidate: 1,
     };
@@ -189,16 +203,24 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                             </div>
                             {/* Incoming Item */}
                             <Tabs defaultValue='account' className='w-full'>
-                                <TabsList>
-                                    <TabsTrigger value='account'>
-                                        Account
+                                <TabsList className='ml-6'>
+                                    <TabsTrigger value='account' className=''>
+                                        Incoming Item
                                     </TabsTrigger>
-                                    <TabsTrigger value='password'>
-                                        Password
+                                    <TabsTrigger value='password' className=''>
+                                        Add Incoming Item
                                     </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value='account'>
-                                    <div className='px-6'>
+                                    <motion.div
+                                        initial={{
+                                            opacity: 0,
+                                            x: -100,
+                                        }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ duration: 0.4 }}
+                                        className='px-6'
+                                    >
                                         <div className=' h-fit p-5 text-lg mt-5 bg-cardBlack w-full  rounded-lg'>
                                             <Table className='text-white font-outfit'>
                                                 <TableCaption>
@@ -330,7 +352,10 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                     <DialogTrigger
                                                                         asChild
                                                                     >
-                                                                        <img width={25}
+                                                                        <img
+                                                                            width={
+                                                                                25
+                                                                            }
                                                                             src='/delete_icon.png'
                                                                             alt=''
                                                                         />
@@ -395,10 +420,67 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                 </TableBody>
                                             </Table>
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 </TabsContent>
                                 <TabsContent value='password'>
-                                    Change your password here.
+                                    <motion.div
+                                        initial={{
+                                            opacity: 0,
+                                            x: -100,
+                                        }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ duration: 0.4 }}
+                                        className='px-9 flex flex-col gap-3'
+                                    >
+                                        <h2 className='text-lg'>
+                                            Select an Item :
+                                        </h2>
+                                        <Select>
+                                            <SelectTrigger className='w-[35%]'>
+                                                <SelectValue placeholder='Select Item' />
+                                            </SelectTrigger>
+
+                                            <SelectContent className='bg-cardBlack text-white'>
+                                                <ScrollArea className='h-40'>
+                                                    {props.items.map((prop) => (
+                                                        <SelectItem
+                                                            key={prop.item_id.toString()}
+                                                            value={prop.item_id.toString()}
+                                                        >
+                                                            {prop.item_name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </ScrollArea>
+                                            </SelectContent>
+                                        </Select>
+                                        <h2 className='text-lg'>
+                                            Add Quantity :
+                                        </h2>
+                                        <Input
+                                            name='quantity'
+                                            className='bg-cardBlack w-1/4'
+                                            placeholder='30'
+                                            // onChange={(e) =>
+                                            //     setQuantityState(e.target.value)
+                                            // }
+                                            type='number'
+                                            min={0}
+                                            required
+                                        />
+                                        <div className="flex justify-end">
+                                            <Button
+                                                className='bg-bluePrimary w-1/6 '
+                                                // onClick={() =>
+                                                //     handleUpdateOutgoing(
+                                                //         prop.outgoing_item_id,
+                                                //         prop.warehouse_id
+                                                //     )
+                                                // }
+                                            >
+                                                Save changes
+                                            </Button>
+                                        </div>
+                                    </motion.div>
                                 </TabsContent>
                             </Tabs>
                         </div>
