@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router';
 import { prisma } from '../../db/client';
-import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import type { InferGetStaticPropsType, GetStaticProps, NextPage } from 'next';
 import { Prisma } from '@prisma/client';
 
@@ -53,8 +52,6 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 
-// import { json } from 'stream/consumers';
-// import { revalidatePath } from 'next/cache';
 
 async function getItem() {
     const items = await prisma.item_table.findMany();

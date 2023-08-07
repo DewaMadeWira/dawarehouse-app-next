@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import Navbar from '@/components/Navbar';
 import NavbarPhone from '@/components/NavbarPhone';
 import { useEffect, useState } from 'react';
@@ -6,6 +7,18 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../../db/client';
 
 import { motion } from 'framer-motion';
+
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -35,6 +48,8 @@ import SidebarDesktop from '@/components/SidebarDesktop';
 
 import TotalBar from '@/components/TotalBar';
 import SelectComponent from '@/components/SelectComponent';
+
+import { useToast } from '@/components/ui/use-toast';
 
 import {
     Dialog,
@@ -135,10 +150,21 @@ interface StatusType {
 const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     props: InferGetStaticPropsType<typeof getStaticProps>
 ) => {
+    const router = useRouter();
+
+    const { toast } = useToast();
+
+    const refreshData = () => {
+        router.replace(router.asPath);
+    };
+
     const [windowWidth, setWindowWidth] = useState<number>(700);
 
     const [data, setData] =
         useState<Prisma.PromiseReturnType<typeof getIncomingItems>>();
+
+    const [itemState, setItemState] = useState('');
+    const [quantityState, setQuantityState] = useState('');
 
     const [sortSelect, setSortSelect] = useState('ascending');
 
@@ -162,7 +188,69 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
 
     useEffect(() => {
         setData(props.incomingItems);
-    }, []);
+    });
+
+    async function handleDeleteIncoming(itemId: number, warehouseId: number) {
+        const res = await fetch('/api/deleteIncoming', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                itemId: itemId,
+                warehouseId: warehouseId,
+            }),
+        });
+
+        if (res.json != null) {
+            // alert('refresh called');
+            // setData((current) =>
+            //     current?.filter((prop) => {
+            //         return (
+            //             prop.warehouse_id != warehouseId &&
+            //             prop.incoming_item_id != itemId
+            //         );
+            //     })
+            // );
+            refreshData();
+        }
+    }
+
+    async function handleSubmit() {
+        if (quantityState == '' || quantityState == '0') {
+            console.log('quantity 0');
+            //
+            toast({
+                description: 'Quantity cannot be 0 or negative (-1) !',
+                className: 'bg-yellow p-5 font-outfit border-none ',
+            });
+            return;
+        }
+        if (itemState == '') {
+            toast({
+                description: 'Please select an item !',
+                className: 'bg-yellow p-5 font-outfit border-none ',
+            });
+            return;
+        }
+        alert(quantityState + ' ' + itemState);
+
+        const res = await fetch('/api/incomingItem', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                item: itemState,
+                quantity: quantityState,
+            }),
+        });
+
+        if (res.json != null) {
+            refreshData();
+            setData(props.incomingItems);
+        }
+    }
 
     return (
         <main className='min-h-screen bg-bgBlack text-white font-outfit'>
@@ -348,72 +436,76 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                 </Dialog>
                                                             </TableCell>
                                                             <TableCell className=''>
-                                                                <Dialog>
-                                                                    <DialogTrigger
-                                                                        asChild
-                                                                    >
+                                                                <AlertDialog>
+                                                                    <AlertDialogTrigger>
                                                                         <img
+                                                                            className='hover:-translate-y-1 transition-all '
                                                                             width={
-                                                                                25
+                                                                                20
                                                                             }
-                                                                            src='/delete_icon.png'
-                                                                            alt=''
+                                                                            height={
+                                                                                20
+                                                                            }
+                                                                            src='delete_icon.png'
+                                                                            alt='delete icon'
                                                                         />
-                                                                    </DialogTrigger>
-                                                                    <DialogContent className='sm:max-w-[425px]'>
-                                                                        <DialogHeader>
-                                                                            <DialogTitle>
-                                                                                Edit
-                                                                                profile
-                                                                            </DialogTitle>
-                                                                            <DialogDescription>
-                                                                                Make
-                                                                                changes
+                                                                    </AlertDialogTrigger>
+                                                                    <AlertDialogContent className='font-outfit bg-cardBlack text-white'>
+                                                                        <AlertDialogHeader>
+                                                                            <AlertDialogTitle className=''>
+                                                                                Are
+                                                                                you
+                                                                                sure
                                                                                 to
-                                                                                your
-                                                                                profile
-                                                                                here.
-                                                                                Click
-                                                                                save
-                                                                                when
-                                                                                you're
-                                                                                done.
-                                                                            </DialogDescription>
-                                                                        </DialogHeader>
-                                                                        <div className='grid gap-4 py-4 text-bgBlack'>
-                                                                            <div className='grid grid-cols-4 items-center gap-4'>
-                                                                                <label
-                                                                                    htmlFor='name'
-                                                                                    className='text-right'
-                                                                                >
-                                                                                    Name
-                                                                                </label>
-                                                                                <input
-                                                                                    id='name'
-                                                                                    className='col-span-3'
-                                                                                />
-                                                                            </div>
-                                                                            <div className='grid grid-cols-4 items-center gap-4'>
-                                                                                <label
-                                                                                    htmlFor='username'
-                                                                                    className='text-right'
-                                                                                >
-                                                                                    Username
-                                                                                </label>
-                                                                                <input
-                                                                                    id='username'
-                                                                                    className='col-span-3'
-                                                                                />
-                                                                            </div>
-                                                                        </div>
-                                                                        <DialogFooter>
-                                                                            <Button type='submit'>
-                                                                                Save
-                                                                                changes
-                                                                            </Button>
-                                                                        </DialogFooter>
-                                                                    </DialogContent>
-                                                                </Dialog>
+                                                                                delete
+                                                                                an
+                                                                                delete
+                                                                                an{' '}
+                                                                                <span className='font-bold'>
+                                                                                    Incoming
+                                                                                    Item
+                                                                                </span>{' '}
+                                                                                ?
+                                                                            </AlertDialogTitle>
+                                                                            <AlertDialogDescription>
+                                                                                This
+                                                                                will
+                                                                                make
+                                                                                the
+                                                                                item
+                                                                                on
+                                                                                the
+                                                                                warehouse{' '}
+                                                                                <span className='font-bold'>
+                                                                                    deleted
+                                                                                </span>
+
+                                                                                .
+                                                                                Action
+                                                                                cannot
+                                                                                be
+                                                                                undone.
+                                                                            </AlertDialogDescription>
+                                                                        </AlertDialogHeader>
+                                                                        <AlertDialogFooter>
+                                                                            <AlertDialogCancel className='bg-bluePrimary'>
+                                                                                Cancel
+                                                                            </AlertDialogCancel>
+                                                                            <AlertDialogAction
+                                                                                className='bg-red text-white'
+                                                                                onClick={() => {
+                                                                                    handleDeleteIncoming(
+                                                                                        prop.incoming_item_id,
+                                                                                        prop.warehouse_id
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                Delete
+                                                                                Item
+                                                                            </AlertDialogAction>
+                                                                        </AlertDialogFooter>
+                                                                    </AlertDialogContent>
+                                                                </AlertDialog>
                                                             </TableCell>
                                                         </TableRow>
                                                     ))}
@@ -435,7 +527,11 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                         <h2 className='text-lg'>
                                             Select an Item :
                                         </h2>
-                                        <Select>
+                                        <Select
+                                            onValueChange={(e) => {
+                                                setItemState(e);
+                                            }}
+                                        >
                                             <SelectTrigger className='w-[35%]'>
                                                 <SelectValue placeholder='Select Item' />
                                             </SelectTrigger>
@@ -457,6 +553,11 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                             Add Quantity :
                                         </h2>
                                         <Input
+                                            onChange={(e) => {
+                                                setQuantityState(
+                                                    e.target.value
+                                                );
+                                            }}
                                             name='quantity'
                                             className='bg-cardBlack w-1/4'
                                             placeholder='30'
@@ -467,17 +568,12 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                             min={0}
                                             required
                                         />
-                                        <div className="flex justify-end">
+                                        <div className='flex justify-end'>
                                             <Button
-                                                className='bg-bluePrimary w-1/6 '
-                                                // onClick={() =>
-                                                //     handleUpdateOutgoing(
-                                                //         prop.outgoing_item_id,
-                                                //         prop.warehouse_id
-                                                //     )
-                                                // }
+                                                className='bg-bluePrimary w-1/6 hover:scale-105 transition-all hover:shadow-bluePrimary hover:shadow-md '
+                                                onClick={() => handleSubmit()}
                                             >
-                                                Save changes
+                                                Add Incoming Item
                                             </Button>
                                         </div>
                                     </motion.div>

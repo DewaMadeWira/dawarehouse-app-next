@@ -7,30 +7,30 @@ export default async function handler(
     res: NextApiResponse
 ) {
     if (req.method === 'POST') {
-        const quantity = req.body.quantity;
-        const itemId = req.body.item;
-        // res.redirect(302, `${quantity}`);
+        const quantity = parseInt(req.body.quantity);
+        const itemId = parseInt(req.body.item);
 
-        await prisma.warehouse_table.create({
+        const warehouse = await prisma.warehouse_table.create({
             data: {
-                warehouse_quantity: +quantity,
-                item_id: +itemId,
+                warehouse_quantity: quantity,
+                item_id: itemId,
             },
         });
-        const recentWarehouse = await prisma.warehouse_table.findFirstOrThrow({
-            orderBy: {
-                item_id: 'desc',
-            },
-        });
+
+        // const recentWarehouse = await prisma.warehouse_table.findFirst({
+        //     orderBy: {
+        //         item_id: 'desc',
+        //     },
+        // });
 
         await prisma.incoming_item_table.create({
             data: {
-                warehouse_id: recentWarehouse?.warehouse_id,
-                incoming_item_quantity: +recentWarehouse?.warehouse_quantity,
+                warehouse_id: warehouse.warehouse_id,
+                incoming_item_quantity: +warehouse.warehouse_quantity,
             },
         });
 
-        await res.revalidate('/');
+        await res.revalidate('/incoming');
         // res.redirect("/")
         return res.json({ revalidated: true });
     }

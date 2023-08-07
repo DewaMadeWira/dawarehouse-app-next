@@ -2,14 +2,21 @@ import { useContext } from 'react';
 import { NavbarContext } from '@/context/NavbarContext';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
 const SidebarDesktop = () => {
+    //  const [path, setPath] = useState('');
+
     const { navbarValue, setNavbarValue } = useContext(NavbarContext);
     const router = useRouter();
 
-    function changeSide(value: string) {
-        setNavbarValue(value);
-    }
+    useEffect(() => {
+        setNavbarValue(window.location.pathname.substring(1));
+    }, []);
+
+    // function changeSide(value: string) {
+    //     setNavbarValue(value);
+    // }
 
     return (
         <motion.div
@@ -21,7 +28,7 @@ const SidebarDesktop = () => {
             {/* Warehouse */}
             <button
                 onClick={() => {
-                    changeSide('warehouse');
+                    // changeSide('warehouse');
                     router.push('/warehouse');
                 }}
                 className={`flex transition-all w-full justify-start gap-10 items-center rounded-lg px-5 py-3 hover:bg-cardGray hover:-translate-y-1 ${
@@ -34,7 +41,7 @@ const SidebarDesktop = () => {
             {/* Incoming */}
             <button
                 onClick={() => {
-                    changeSide('incoming');
+                    // changeSide('incoming');
                     router.push('/incoming');
                 }}
                 className={`flex transition-all w-full justify-start gap-10 items-center rounded-lg px-5 py-3 hover:bg-cardGray hover:-translate-y-1 ${
@@ -47,7 +54,7 @@ const SidebarDesktop = () => {
             {/* Outgoing */}
             <button
                 onClick={() => {
-                    changeSide('outgoing');
+                    // changeSide('outgoing');
                     router.push('/outgoing');
                 }}
                 className={`flex transition-all w-full justify-start gap-10 items-center rounded-lg px-5 py-3 hover:bg-cardGray hover:-translate-y-1 ${
@@ -59,7 +66,7 @@ const SidebarDesktop = () => {
             </button>
             <button
                 onClick={() => {
-                    changeSide('outgoing');
+                    // changeSide('outgoing');
                     router.push('/item');
                 }}
                 className={`flex transition-all w-full justify-start gap-10 items-center rounded-lg px-5 py-3 hover:bg-cardGray hover:-translate-y-1 ${

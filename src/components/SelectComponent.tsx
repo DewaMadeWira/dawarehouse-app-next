@@ -8,6 +8,7 @@ import {
 
 import { motion } from 'framer-motion';
 
+
 interface SelectComponentType {
     data: any;
     setData: Function;
@@ -21,6 +22,8 @@ const SelectComponent = ({
     setSortSelect,
     dataType,
 }: SelectComponentType) => {
+   
+
     return (
         <motion.div
             initial={{ opacity: 0, y: -100 }}
@@ -44,8 +47,7 @@ const SelectComponent = ({
                                 })
                             );
                         }
-                    }
-                    else if(dataType =='incoming'){
+                    } else if (dataType == 'incoming') {
                         if (e == 'descending') {
                             setData(
                                 data?.sort((a: any, b: any) => {

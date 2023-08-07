@@ -2,6 +2,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../db/client';
 
+import { revalidatePath } from 'next/cache';
+
 // type Data = {
 //     message: string;
 // };
@@ -37,8 +39,8 @@ export default async function handler(
                 warehouse_id: warehouseId,
             },
         });
-
-        await res.revalidate('/');
+        res.revalidate('/incoming');
+        // revalidatePath('/incoming');
         return res.json({ revalidated: true });
     }
 }
