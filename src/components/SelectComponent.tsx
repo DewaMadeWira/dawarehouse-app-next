@@ -8,7 +8,6 @@ import {
 
 import { motion } from 'framer-motion';
 
-
 interface SelectComponentType {
     data: any;
     setData: Function;
@@ -22,8 +21,6 @@ const SelectComponent = ({
     setSortSelect,
     dataType,
 }: SelectComponentType) => {
-   
-
     return (
         <motion.div
             initial={{ opacity: 0, y: -100 }}
@@ -65,8 +62,7 @@ const SelectComponent = ({
                                 })
                             );
                         }
-                    }
-                    else if(dataType == 'outgoing'){
+                    } else if (dataType == 'outgoing') {
                         if (e == 'descending') {
                             setData(
                                 data?.sort((a: any, b: any) => {
@@ -81,6 +77,20 @@ const SelectComponent = ({
                                     return (
                                         a.outgoing_item_id - b.outgoing_item_id
                                     );
+                                })
+                            );
+                        }
+                    } else if (dataType == 'item') {
+                        if (e == 'descending') {
+                            setData(
+                                data?.sort((a: any, b: any) => {
+                                    return b.item_id - a.item_id;
+                                })
+                            );
+                        } else {
+                            setData(
+                                data?.sort((a: any, b: any) => {
+                                    return a.item_id - b.item_id;
                                 })
                             );
                         }

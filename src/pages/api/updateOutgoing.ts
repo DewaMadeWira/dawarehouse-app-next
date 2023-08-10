@@ -91,7 +91,7 @@ export default async function handler(
         //     });
         // }
 
-        await res.revalidate('/');
+        await res.revalidate('/outgoing');
         return res.json({ revalidated: true });
     }
 }

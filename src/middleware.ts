@@ -10,7 +10,9 @@ export async function middleware(request: NextRequest) {
         method: 'GET',
     });
     return NextResponse.next();
+    console.log('middleware called !');
 }
+
 export const config = {
-    matcher: ['/'],
+    matcher: ['/warehouse'],
 };

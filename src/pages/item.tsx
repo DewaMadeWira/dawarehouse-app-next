@@ -63,26 +63,26 @@ import {
 import { Button } from '@/components/ui/button';
 import CardWarehouse from '@/components/CardWarehouse';
 
-async function getOutgoingItems() {
-    const incomingItems = await prisma.outgoing_item_table.findMany({
-        include: {
-            warehouse_table: {
-                include: {
-                    item_table: true,
-                },
-            },
-        },
-    });
-    return incomingItems;
-}
-async function getWarehouse() {
-    const warehouse = await prisma.warehouse_table.findMany({
-        include: {
-            item_table: true,
-        },
-    });
-    return warehouse;
-}
+// async function getOutgoingItems() {
+//     const incomingItems = await prisma.outgoing_item_table.findMany({
+//         include: {
+//             warehouse_table: {
+//                 include: {
+//                     item_table: true,
+//                 },
+//             },
+//         },
+//     });
+//     return incomingItems;
+// }
+// async function getWarehouse() {
+//     const warehouse = await prisma.warehouse_table.findMany({
+//         include: {
+//             item_table: true,
+//         },
+//     });
+//     return warehouse;
+// }
 
 async function getAllItem() {
     const items = await prisma.item_table.findMany();
@@ -123,31 +123,31 @@ async function getItem() {
 }
 
 export const getStaticProps: GetStaticProps<{
-    outgoingItems: Prisma.PromiseReturnType<typeof getOutgoingItems>;
+    // outgoingItems: Prisma.PromiseReturnType<typeof getOutgoingItems>;
     totalWarehouse: Prisma.PromiseReturnType<typeof getWarehouseSum>;
     incomingSum: Prisma.PromiseReturnType<typeof getIncomingSum>;
     outgoingItem: Prisma.PromiseReturnType<typeof getOutgoingSum>;
     allItem: Prisma.PromiseReturnType<typeof getItem>;
     items: Prisma.PromiseReturnType<typeof getAllItem>;
-    warehouse: Prisma.PromiseReturnType<typeof getWarehouse>;
+    // warehouse: Prisma.PromiseReturnType<typeof getWarehouse>;
 }> = async () => {
-    const outgoingItems = await getOutgoingItems();
+    // const outgoingItems = await getOutgoingItems();
     const totalWarehouse = await getWarehouseSum();
     const incomingSum = await getIncomingSum();
     const outgoingItem = await getOutgoingSum();
     const allItem = await getItem();
     const items = await getAllItem();
-    const warehouse = await getWarehouse();
+    // const warehouse = await getWarehouse();
 
     return {
         props: {
-            outgoingItems: JSON.parse(JSON.stringify(outgoingItems)),
+            // outgoingItems: JSON.parse(JSON.stringify(outgoingItems)),
             totalWarehouse,
             incomingSum,
             outgoingItem,
             allItem,
             items,
-            warehouse,
+            // warehouse,
         },
         // revalidate: 1,
     };
@@ -159,7 +159,7 @@ interface StatusType {
     empty: boolean;
 }
 
-const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
+const Item: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     props: InferGetStaticPropsType<typeof getStaticProps>
 ) => {
     const router = useRouter();
@@ -173,18 +173,14 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     const [windowWidth, setWindowWidth] = useState<number>(700);
 
     const [data, setData] =
-        useState<Prisma.PromiseReturnType<typeof getOutgoingItems>>();
+        useState<Prisma.PromiseReturnType<typeof getAllItem>>();
 
     const [itemState, setItemState] = useState('');
-    const [quantityState, setQuantityState] = useState('');
+    const [name, setName] = useState('');
+    const [category, setCategory] = useState('');
+    const [price, setPrice] = useState('');
 
     const [sortSelect, setSortSelect] = useState('ascending');
-
-    const [statusCheckbox, setStatusCheckbox] = useState<StatusType>({
-        empty: true,
-        inStock: true,
-        needRestock: true,
-    });
 
     useEffect(() => {
         function handleResize() {
@@ -199,7 +195,7 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     }, []);
 
     useEffect(() => {
-        setData(props.outgoingItems);
+        setData(props.items);
     });
 
     async function handleDeleteOutgoing(itemId: number, warehouseId: number) {
@@ -228,84 +224,108 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
         }
     }
 
-    async function handleSubmit() {
-        if (quantityState == '' || quantityState == '0') {
-            // console.log('quantity 0');
-            //
-            toast({
-                description: 'Quantity cannot be 0 or negative (-1) !',
-                className: 'bg-yellow p-5 font-outfit border-none ',
-            });
-            return;
-        }
-        if (itemState == '') {
-            toast({
-                description: 'Please select an item !',
-                className: 'bg-yellow p-5 font-outfit border-none ',
-            });
-            return;
-        }
-        // alert(quantityState + ' ' + itemState);
+    // async function handleSubmit() {
+    //     if (quantityState == '' || quantityState == '0') {
+    //         // console.log('quantity 0');
+    //         //
+    //         toast({
+    //             description: 'Quantity cannot be 0 or negative (-1) !',
+    //             className: 'bg-yellow p-5 font-outfit border-none ',
+    //         });
+    //         return;
+    //     }
+    //     if (itemState == '') {
+    //         toast({
+    //             description: 'Please select an item !',
+    //             className: 'bg-yellow p-5 font-outfit border-none ',
+    //         });
+    //         return;
+    //     }
+    //     // alert(quantityState + ' ' + itemState);
 
-        const res = await fetch('/api/outgoingItem', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                itemId: itemState,
-                quantity: quantityState,
-            }),
-        });
+    //     const res = await fetch('/api/outgoingItem', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify({
+    //             itemId: itemState,
+    //             quantity: quantityState,
+    //         }),
+    //     });
 
-        if (res.status == 400) {
-            toast({
-                description: 'Quantity Insufficient !',
-                className: 'bg-red p-5 font-outfit border-none ',
-            });
-            return;
-        }
+    //     if (res.status == 400) {
+    //         toast({
+    //             description: 'Quantity Insufficient !',
+    //             className: 'bg-red p-5 font-outfit border-none ',
+    //         });
+    //         return;
+    //     }
 
-        if (res.status == 200) {
-            setQuantityState('');
-            refreshData();
-            setData(props.outgoingItems);
-        }
-    }
+    //     if (res.status == 200) {
+    //         setQuantityState('');
+    //         refreshData();
+    //         setData(props.items);
+    //     }
+    // }
 
     async function handleEdit(itemId: number) {
-        if (quantityState == '' || quantityState == '0') {
+        if (name == '') {
             // console.log('quantity 0');
             //
             toast({
-                description: 'Quantity cannot be 0 or negative (-1) !',
+                description: 'Item name cannot be empty  !',
                 className: 'bg-yellow p-5 font-outfit border-none ',
             });
             return;
         }
+        if (category == '') {
+            // console.log('quantity 0');
+            //
+            toast({
+                description: 'Item category cannot be empty  !',
+                className: 'bg-yellow p-5 font-outfit border-none ',
+            });
+            return;
+        }
+        if (price == '' || price == '0') {
+            // console.log('quantity 0');
+            //
+            toast({
+                description: 'Item price cannot be empty  or negative (-)!',
+                className: 'bg-yellow p-5 font-outfit border-none ',
+            });
+            return;
+        }
+        // alert(price);
 
-        const res = await fetch('/api/updateOutgoing', {
+        const res = await fetch('/api/updateItem', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                itemId: itemId,
-                quantityUpdate: quantityState,
+                id: itemId,
+                name: name,
+                category: category,
+                price: price,
             }),
         });
         if (res.status == 400) {
             toast({
-                description: 'Quantity Insufficient !',
+                description: 'Update Fails  !',
                 className: 'bg-red p-5 font-outfit border-none ',
             });
             return;
         }
 
         if (res.json != null) {
-            setQuantityState('');
+            setName('');
+            setItemState('');
+            setCategory('');
+            setPrice('');
             refreshData();
-            setData(props.outgoingItems);
+            setData(props.items);
         }
     }
 
@@ -339,7 +359,7 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                     data={data}
                                     setData={setData}
                                     setSortSelect={setSortSelect}
-                                    dataType='outgoing'
+                                    dataType='item'
                                 />
                                 {/* <StatusCheckBox
                                     statusCheckbox={statusCheckbox}
@@ -350,10 +370,10 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                             <Tabs defaultValue='account' className='w-full'>
                                 <TabsList className='ml-6'>
                                     <TabsTrigger value='account' className=''>
-                                        Outgoing Item
+                                        Item
                                     </TabsTrigger>
                                     <TabsTrigger value='password' className=''>
-                                        Add Outgoing Item
+                                        Add Item
                                     </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value='account'>
@@ -378,55 +398,40 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                 <TableHeader>
                                                     <TableRow className='text-gray hover:bg-cardBlack'>
                                                         <TableHead className=''>
-                                                            Outgoing ID
+                                                            Item ID
                                                         </TableHead>
                                                         <TableHead className=''>
                                                             Item Name
                                                         </TableHead>
                                                         <TableHead className=''>
-                                                            Warehouse ID
+                                                            Category
                                                         </TableHead>
                                                         <TableHead className=''>
-                                                            Quantity
-                                                        </TableHead>
-                                                        <TableHead className=''>
-                                                            Date
+                                                            Price
                                                         </TableHead>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
                                                     {data?.map((prop) => (
                                                         <TableRow
-                                                            key={
-                                                                prop.outgoing_item_id
-                                                            }
+                                                            key={prop.item_id}
                                                         >
                                                             <TableCell className=''>
-                                                                {
-                                                                    prop.outgoing_item_id
-                                                                }
+                                                                {prop.item_id}
+                                                            </TableCell>
+                                                            <TableCell className=''>
+                                                                {prop.item_name}
                                                             </TableCell>
                                                             <TableCell className=''>
                                                                 {
-                                                                    prop
-                                                                        .warehouse_table
-                                                                        .item_table
-                                                                        .item_name
+                                                                    prop.item_category
                                                                 }
                                                             </TableCell>
                                                             <TableCell className=''>
-                                                                {
-                                                                    prop.warehouse_id
-                                                                }
+                                                                {'Rp ' +
+                                                                    prop.item_price}
                                                             </TableCell>
-                                                            <TableCell className=''>
-                                                                {
-                                                                    prop.outgoing_item_quantity
-                                                                }
-                                                            </TableCell>
-                                                            <TableCell className=''>
-                                                                {prop.outgoing_item_date?.toString()}
-                                                            </TableCell>
+
                                                             <TableCell className=''>
                                                                 <Dialog>
                                                                     <DialogTrigger
@@ -444,7 +449,7 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                                 Item
                                                                                 '
                                                                                 {
-                                                                                    prop.outgoing_item_id
+                                                                                    prop.item_name
                                                                                 }
 
                                                                                 '
@@ -452,58 +457,120 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                             <DialogDescription>
                                                                                 This
                                                                                 will
-                                                                                effect
-                                                                                the{' '}
+                                                                                effect{' '}
                                                                                 <span className='font-bold'>
-                                                                                    Warehouse
+                                                                                    All
                                                                                 </span>{' '}
+                                                                                item
+                                                                                across
+                                                                                the
                                                                                 Table.
                                                                             </DialogDescription>
                                                                         </DialogHeader>
 
                                                                         <div className='flex flex-col gap-5'>
-                                                                            <p>
-                                                                                Warehouse
-                                                                                quantity
-                                                                                :{' '}
-                                                                                {
-                                                                                    prop
-                                                                                        .warehouse_table
-                                                                                        .warehouse_quantity
-                                                                                }
-                                                                            </p>
                                                                             <label
-                                                                                htmlFor='quantity'
+                                                                                htmlFor='name'
                                                                                 className=''
                                                                             >
-                                                                                Quantity
+                                                                                Name
                                                                                 :
                                                                             </label>
                                                                             <input
                                                                                 onChange={(
                                                                                     e
                                                                                 ) => {
-                                                                                    setQuantityState(
+                                                                                    setName(
                                                                                         e
                                                                                             .target
                                                                                             .value
                                                                                     );
                                                                                 }}
-                                                                                id='quantity'
-                                                                                className=' px-2 w-1/3 bg-cardBlack text-white border-2 border-white rounded-md outline-none'
-                                                                                type='number'
-                                                                                placeholder='20'
+                                                                                id='name'
+                                                                                className=' px-2 bg-cardBlack text-white border-2 border-white rounded-md outline-none'
+                                                                                type='text'
+                                                                                placeholder='GTX 950'
                                                                                 min={
                                                                                     0
                                                                                 }
                                                                             />
+                                                                            <label
+                                                                                htmlFor='category'
+                                                                                className=''
+                                                                            >
+                                                                                Category
+                                                                                :
+                                                                            </label>
+                                                                            <Select
+                                                                                onValueChange={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    setCategory(
+                                                                                        e
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                <SelectTrigger className='w-[180px]'>
+                                                                                    <SelectValue placeholder='Category' />
+                                                                                </SelectTrigger>
+                                                                                <SelectContent className='h-40 bg-cardBlack text-white'>
+                                                                                    <SelectItem value='Graphic Card'>
+                                                                                        Graphic
+                                                                                        Card
+                                                                                    </SelectItem>
+                                                                                    <SelectItem value='CPU'>
+                                                                                        CPU
+                                                                                    </SelectItem>
+                                                                                    <SelectItem value='RAM'>
+                                                                                        RAM
+                                                                                    </SelectItem>
+                                                                                    <SelectItem value='SSD'>
+                                                                                        SSD
+                                                                                    </SelectItem>
+                                                                                    <SelectItem value='Mechanical Keyboard'>
+                                                                                        Mechanical
+                                                                                        Keyboard
+                                                                                    </SelectItem>
+                                                                                </SelectContent>
+                                                                            </Select>
+
+                                                                            <label
+                                                                                htmlFor='price'
+                                                                                className=''
+                                                                            >
+                                                                                Price
+                                                                                :
+                                                                            </label>
+                                                                            <div className='flex'>
+                                                                                <p className='mr-4'>
+                                                                                    Rp:{' '}
+                                                                                </p>
+                                                                                <input
+                                                                                    onChange={(
+                                                                                        e
+                                                                                    ) => {
+                                                                                        setPrice(
+                                                                                            e
+                                                                                                .target
+                                                                                                .value
+                                                                                        );
+                                                                                    }}
+                                                                                    id='price'
+                                                                                    className=' px-2 w-1/3 bg-cardBlack text-white border-2 border-white rounded-md outline-none'
+                                                                                    type='text'
+                                                                                    placeholder='2000'
+                                                                                    min={
+                                                                                        0
+                                                                                    }
+                                                                                />
+                                                                            </div>
                                                                         </div>
 
                                                                         <DialogFooter>
                                                                             <Button
                                                                                 onClick={() => {
                                                                                     handleEdit(
-                                                                                        prop.outgoing_item_id
+                                                                                        prop.item_id
                                                                                     );
                                                                                 }}
                                                                                 type='submit'
@@ -576,8 +643,8 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                                 className='bg-red text-white'
                                                                                 onClick={() => {
                                                                                     handleDeleteOutgoing(
-                                                                                        prop.outgoing_item_id,
-                                                                                        prop.warehouse_id
+                                                                                        prop.item_id,
+                                                                                        prop.item_id
                                                                                     );
                                                                                 }}
                                                                             >
@@ -608,7 +675,7 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                         <h2 className='text-lg'>
                                             Select an Item :
                                         </h2>
-                                        <Select
+                                        {/* <Select
                                             onValueChange={(e) => {
                                                 setItemState(e);
                                             }}
@@ -619,55 +686,45 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
 
                                             <SelectContent className='bg-cardBlack text-white'>
                                                 <ScrollArea className='h-40'>
-                                                    {props.warehouse
-                                                        .filter((e) => {
-                                                            return (
-                                                                e.warehouse_quantity >
-                                                                0
-                                                            );
-                                                        })
-                                                        .map((prop) => (
-                                                            <SelectItem
-                                                                key={prop.warehouse_id.toString()}
-                                                                value={prop.warehouse_id.toString()}
-                                                                className='hover:bg-cardGray transition-all'
-                                                            >
-                                                                <div className='flex flex-col gap-2 '>
-                                                                    <h4 className='font-bold'>
-                                                                        {
-                                                                            prop
-                                                                                .item_table
-                                                                                .item_name
-                                                                        }
-                                                                    </h4>
-                                                                    <p>
-                                                                        Warehouse
-                                                                        ID :{' '}
-                                                                        {
-                                                                            prop.warehouse_id
-                                                                        }
-                                                                    </p>
-                                                                    <p>
-                                                                        Quantity
-                                                                        :{' '}
-                                                                        {
-                                                                            prop.warehouse_quantity
-                                                                        }
-                                                                    </p>
-                                                                </div>
-                                                            </SelectItem>
-                                                        ))}
+                                                    {props.items.map((prop) => (
+                                                        <SelectItem
+                                                            key={prop.item_id.toString()}
+                                                            value={prop.item_id.toString()}
+                                                            className='hover:bg-cardGray transition-all'
+                                                        >
+                                                            <div className='flex flex-col gap-2 '>
+                                                                <h4 className='font-bold'>
+                                                                    {
+                                                                        prop
+                                                                    }
+                                                                </h4>
+                                                                <p>
+                                                                    Warehouse ID
+                                                                    :{' '}
+                                                                    {
+                                                                        prop.warehouse_id
+                                                                    }
+                                                                </p>
+                                                                <p>
+                                                                    Quantity :{' '}
+                                                                    {
+                                                                        prop.warehouse_quantity
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                        </SelectItem>
+                                                    ))}
                                                 </ScrollArea>
                                             </SelectContent>
-                                        </Select>
+                                        </Select> */}
                                         <h2 className='text-lg'>
                                             Add Quantity :
                                         </h2>
                                         <Input
                                             onChange={(e) => {
-                                                setQuantityState(
-                                                    e.target.value
-                                                );
+                                                // setQuantityState(
+                                                //     e.target.value
+                                                // );
                                             }}
                                             name='quantity'
                                             className='bg-cardBlack w-1/4'
@@ -682,7 +739,7 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                         <div className='flex justify-end'>
                                             <Button
                                                 className='bg-bluePrimary w-1/6 hover:scale-105 transition-all hover:shadow-bluePrimary hover:shadow-md '
-                                                onClick={() => handleSubmit()}
+                                                onClick={() => {}}
                                             >
                                                 Add Outgoing Item
                                             </Button>
@@ -703,17 +760,16 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                 data={data}
                                 setData={setData}
                                 setSortSelect={setSortSelect}
-                                dataType='outgoing'
+                                dataType='item'
                             />
                         </div>
                         <div className='w-full mt-10 flex flex-col gap-7'>
                             {data?.map((prop) => (
                                 <CardWarehouse
-                                    name={
-                                        prop.warehouse_table.item_table
-                                            .item_name
+                                    name={prop.item_name}
+                                    quantity={
+                                        'Rp ' + prop.item_price.toString()
                                     }
-                                    quantity={prop.outgoing_item_quantity.toString()}
                                     // status={prop.status?.toString()}
                                 ></CardWarehouse>
                             ))}
@@ -725,4 +781,4 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     );
 };
 
-export default Outgoing;
+export default Item;
