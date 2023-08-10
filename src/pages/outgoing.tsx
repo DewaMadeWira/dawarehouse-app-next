@@ -284,16 +284,23 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
             return;
         }
 
-        const res = await fetch('/api/updateIncoming', {
+        const res = await fetch('/api/updateOutgoing', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 itemId: itemId,
-                quantity: quantityState,
+                quantityUpdate: quantityState,
             }),
         });
+        if (res.status == 400) {
+            toast({
+                description: 'Quantity Insufficient !',
+                className: 'bg-red p-5 font-outfit border-none ',
+            });
+            return;
+        }
 
         if (res.json != null) {
             setQuantityState('');
@@ -455,6 +462,16 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                         </DialogHeader>
 
                                                                         <div className='flex flex-col gap-5'>
+                                                                            <p>
+                                                                                Warehouse
+                                                                                quantity
+                                                                                :{' '}
+                                                                                {
+                                                                                    prop
+                                                                                        .warehouse_table
+                                                                                        .warehouse_quantity
+                                                                                }
+                                                                            </p>
                                                                             <label
                                                                                 htmlFor='quantity'
                                                                                 className=''
