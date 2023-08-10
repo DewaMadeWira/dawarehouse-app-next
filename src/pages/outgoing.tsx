@@ -258,7 +258,15 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
             }),
         });
 
-        if (res.json != null) {
+        if (res.status == 400) {
+            toast({
+                description: 'Quantity Insufficient !',
+                className: 'bg-red p-5 font-outfit border-none ',
+            });
+            return;
+        }
+
+        if (res.status == 200) {
             setQuantityState('');
             refreshData();
             setData(props.outgoingItems);
@@ -275,6 +283,7 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
             });
             return;
         }
+
         const res = await fetch('/api/updateIncoming', {
             method: 'POST',
             headers: {
@@ -323,7 +332,7 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                     data={data}
                                     setData={setData}
                                     setSortSelect={setSortSelect}
-                                    dataType='incoming'
+                                    dataType='outgoing'
                                 />
                                 {/* <StatusCheckBox
                                     statusCheckbox={statusCheckbox}

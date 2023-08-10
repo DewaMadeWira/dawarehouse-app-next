@@ -9,19 +9,27 @@ export default async function handler(
     if (req.method === 'POST') {
         const quantity = parseInt(req.body.quantity);
         const itemId = parseInt(req.body.itemId);
-        // res.redirect(302, `${itemId}`);
-        // return res.json({message:itemId})
 
-        await prisma.warehouse_table.update({
-            where: {
-                warehouse_id: itemId,
-            },
-            data: {
-                warehouse_quantity: {
-                    decrement: quantity,
+        try {
+            const warehouse = await prisma.warehouse_table.update({
+                where: {
+                    warehouse_id: itemId,
+                    warehouse_quantity: {
+                        gte: quantity,
+                    },
                 },
-            },
-        });
+                data: {
+                    warehouse_quantity: {
+                        decrement: quantity,
+                    },
+                },
+            });
+        } catch {
+            console.log('Quantity insufficient');
+            return res.status(400).json({ message: 'Quantity insufficient' });
+            // return res.json({ message: 'Quantity insufficient' });
+        }
+
         // const recentItem = await prisma.warehouse_table.findUnique({
         //     where: {
         //         warehouse_id: +itemId,
@@ -36,6 +44,6 @@ export default async function handler(
         });
 
         await res.revalidate('/outgoing');
-        return res.json({ revalidated: true });
+        return res.status(200).json({ revalidated: true });
     }
 }

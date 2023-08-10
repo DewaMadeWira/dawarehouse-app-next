@@ -66,6 +66,25 @@ const SelectComponent = ({
                             );
                         }
                     }
+                    else if(dataType == 'outgoing'){
+                        if (e == 'descending') {
+                            setData(
+                                data?.sort((a: any, b: any) => {
+                                    return (
+                                        b.outgoing_item_id - a.outgoing_item_id
+                                    );
+                                })
+                            );
+                        } else {
+                            setData(
+                                data?.sort((a: any, b: any) => {
+                                    return (
+                                        a.outgoing_item_id - b.outgoing_item_id
+                                    );
+                                })
+                            );
+                        }
+                    }
                 }}
             >
                 <SelectTrigger className='w-fit border-bluePrimary'>
