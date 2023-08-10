@@ -12,8 +12,10 @@ const CardWarehouse = ({ name, quantity, status }: CardType) => {
             return <Button className={`bg-green`}>{status}</Button>;
         } else if (status == 'Need Restock') {
             return <Button className={`bg-yellow`}>{status}</Button>;
-        } else {
+        } else if (status == 'Empty') {
             return <Button className={`bg-red`}>{status}</Button>;
+        } else {
+            return;
         }
     }
     return (

@@ -20,7 +20,7 @@ interface NavbarType {
 
 const NavbarPhone = ({ isWarehouse }: NavbarType) => {
     return (
-        <nav className='flex items-center justify-between p-6'>
+        <nav className='flex items-center justify-between p-6 sticky top-0 bg-bgBlack'>
             {isWarehouse ? (
                 <Sheet>
                     <SheetTrigger>
@@ -42,11 +42,41 @@ const NavbarPhone = ({ isWarehouse }: NavbarType) => {
                         <SheetHeader>
                             <SheetDescription>
                                 <div className='flex flex-col gap-10'>
-                                    <img src='/logo.png' alt='' />
-                                    <img src='/warehouse.png' alt='' />
-                                    <img src='/incoming.png' alt='' />
-                                    <img src='/outgoing.png' alt='' />
-                                    <img src='/item.png' alt='' />
+                                    <Link href={'/'}>
+                                        <img
+                                            src='/logo.png'
+                                            width={55}
+                                            alt=''
+                                        />
+                                    </Link>
+                                    <Link href={'/warehouse'}>
+                                        <img
+                                            src='/warehouse.png'
+                                            width={55}
+                                            alt=''
+                                        />
+                                    </Link>
+                                    <Link href={'/incoming'}>
+                                        <img
+                                            src='/incoming.png'
+                                            width={55}
+                                            alt=''
+                                        />
+                                    </Link>
+                                    <Link href={'/outgoing'}>
+                                        <img
+                                            src='/outgoing.png'
+                                            width={55}
+                                            alt=''
+                                        />
+                                    </Link>
+                                    <Link href={'/item'}>
+                                        <img
+                                            src='/item.png'
+                                            width={55}
+                                            alt=''
+                                        />
+                                    </Link>
                                 </div>
                             </SheetDescription>
                         </SheetHeader>

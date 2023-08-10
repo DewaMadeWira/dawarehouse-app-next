@@ -11,10 +11,10 @@ export default async function handler(
     res: NextApiResponse
 ) {
     const itemId = req.body.itemId;
-    const quantity = req.body.quantity;
-    const warehouseId = req.body.warehouseId;
+    const quantity = parseInt(req.body.quantity);
+
     if (req.method === 'POST') {
-        await prisma.incoming_item_table.update({
+        const data = await prisma.incoming_item_table.update({
             where: {
                 incoming_item_id: itemId,
             },
@@ -25,21 +25,14 @@ export default async function handler(
 
         await prisma.warehouse_table.update({
             where: {
-                warehouse_id: warehouseId,
+                warehouse_id: data.warehouse_id,
             },
             data: {
                 warehouse_quantity: quantity,
             },
         });
 
-        await res.revalidate('/');
+        await res.revalidate('/incoming');
         return res.json({ revalidated: true });
-    } else {
-        const search = await prisma.item_table.findFirst({
-            where: {
-                item_id: 11,
-            },
-        });
-        res.json({ search });
     }
 }

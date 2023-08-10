@@ -23,7 +23,7 @@ const SidebarDesktop = () => {
             initial={{ opacity: 0, x: -100 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1 }}
-            className='bg-cardBlack w-1/5 pt-8 h-screen flex flex-col gap-4 px-3'
+            className='bg-cardBlack w-1/5 pt-8 h-screen flex flex-col gap-4 px-3 sticky top-0'
         >
             {/* Warehouse */}
             <button

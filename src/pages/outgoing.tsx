@@ -63,8 +63,8 @@ import {
 import { Button } from '@/components/ui/button';
 import CardWarehouse from '@/components/CardWarehouse';
 
-async function getIncomingItems() {
-    const incomingItems = await prisma.incoming_item_table.findMany({
+async function getOutgoingItems() {
+    const incomingItems = await prisma.outgoing_item_table.findMany({
         include: {
             warehouse_table: {
                 include: {
@@ -74,6 +74,14 @@ async function getIncomingItems() {
         },
     });
     return incomingItems;
+}
+async function getWarehouse() {
+    const warehouse = await prisma.warehouse_table.findMany({
+        include: {
+            item_table: true,
+        },
+    });
+    return warehouse;
 }
 
 async function getAllItem() {
@@ -115,28 +123,31 @@ async function getItem() {
 }
 
 export const getStaticProps: GetStaticProps<{
-    incomingItems: Prisma.PromiseReturnType<typeof getIncomingItems>;
+    outgoingItems: Prisma.PromiseReturnType<typeof getOutgoingItems>;
     totalWarehouse: Prisma.PromiseReturnType<typeof getWarehouseSum>;
     incomingSum: Prisma.PromiseReturnType<typeof getIncomingSum>;
     outgoingItem: Prisma.PromiseReturnType<typeof getOutgoingSum>;
     allItem: Prisma.PromiseReturnType<typeof getItem>;
     items: Prisma.PromiseReturnType<typeof getAllItem>;
+    warehouse: Prisma.PromiseReturnType<typeof getWarehouse>;
 }> = async () => {
-    const incomingItems = await getIncomingItems();
+    const outgoingItems = await getOutgoingItems();
     const totalWarehouse = await getWarehouseSum();
     const incomingSum = await getIncomingSum();
     const outgoingItem = await getOutgoingSum();
     const allItem = await getItem();
     const items = await getAllItem();
+    const warehouse = await getWarehouse();
 
     return {
         props: {
-            incomingItems: JSON.parse(JSON.stringify(incomingItems)),
+            outgoingItems: JSON.parse(JSON.stringify(outgoingItems)),
             totalWarehouse,
             incomingSum,
             outgoingItem,
             allItem,
             items,
+            warehouse,
         },
         // revalidate: 1,
     };
@@ -148,7 +159,7 @@ interface StatusType {
     empty: boolean;
 }
 
-const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
+const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     props: InferGetStaticPropsType<typeof getStaticProps>
 ) => {
     const router = useRouter();
@@ -162,7 +173,7 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     const [windowWidth, setWindowWidth] = useState<number>(700);
 
     const [data, setData] =
-        useState<Prisma.PromiseReturnType<typeof getIncomingItems>>();
+        useState<Prisma.PromiseReturnType<typeof getOutgoingItems>>();
 
     const [itemState, setItemState] = useState('');
     const [quantityState, setQuantityState] = useState('');
@@ -188,11 +199,11 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     }, []);
 
     useEffect(() => {
-        setData(props.incomingItems);
+        setData(props.outgoingItems);
     });
 
-    async function handleDeleteIncoming(itemId: number, warehouseId: number) {
-        const res = await fetch('/api/deleteIncoming', {
+    async function handleDeleteOutgoing(itemId: number, warehouseId: number) {
+        const res = await fetch('/api/deleteOutgoing', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -236,13 +247,13 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
         }
         // alert(quantityState + ' ' + itemState);
 
-        const res = await fetch('/api/incomingItem', {
+        const res = await fetch('/api/outgoingItem', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                item: itemState,
+                itemId: itemState,
                 quantity: quantityState,
             }),
         });
@@ -250,7 +261,7 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
         if (res.json != null) {
             setQuantityState('');
             refreshData();
-            setData(props.incomingItems);
+            setData(props.outgoingItems);
         }
     }
 
@@ -278,7 +289,7 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
         if (res.json != null) {
             setQuantityState('');
             refreshData();
-            setData(props.incomingItems);
+            setData(props.outgoingItems);
         }
     }
 
@@ -323,10 +334,10 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                             <Tabs defaultValue='account' className='w-full'>
                                 <TabsList className='ml-6'>
                                     <TabsTrigger value='account' className=''>
-                                        Incoming Item
+                                        Outgoing Item
                                     </TabsTrigger>
                                     <TabsTrigger value='password' className=''>
-                                        Add Incoming Item
+                                        Add Outgoing Item
                                     </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value='account'>
@@ -351,7 +362,7 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                 <TableHeader>
                                                     <TableRow className='text-gray hover:bg-cardBlack'>
                                                         <TableHead className=''>
-                                                            Incoming ID
+                                                            Outgoing ID
                                                         </TableHead>
                                                         <TableHead className=''>
                                                             Item Name
@@ -371,12 +382,12 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                     {data?.map((prop) => (
                                                         <TableRow
                                                             key={
-                                                                prop.incoming_item_id
+                                                                prop.outgoing_item_id
                                                             }
                                                         >
                                                             <TableCell className=''>
                                                                 {
-                                                                    prop.incoming_item_id
+                                                                    prop.outgoing_item_id
                                                                 }
                                                             </TableCell>
                                                             <TableCell className=''>
@@ -394,11 +405,11 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                             </TableCell>
                                                             <TableCell className=''>
                                                                 {
-                                                                    prop.incoming_item_quantity
+                                                                    prop.outgoing_item_quantity
                                                                 }
                                                             </TableCell>
                                                             <TableCell className=''>
-                                                                {prop.incoming_item_date.toString()}
+                                                                {prop.outgoing_item_date?.toString()}
                                                             </TableCell>
                                                             <TableCell className=''>
                                                                 <Dialog>
@@ -417,7 +428,7 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                                 Item
                                                                                 '
                                                                                 {
-                                                                                    prop.incoming_item_id
+                                                                                    prop.outgoing_item_id
                                                                                 }
 
                                                                                 '
@@ -466,7 +477,7 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                             <Button
                                                                                 onClick={() => {
                                                                                     handleEdit(
-                                                                                        prop.incoming_item_id
+                                                                                        prop.outgoing_item_id
                                                                                     );
                                                                                 }}
                                                                                 type='submit'
@@ -538,8 +549,8 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                             <AlertDialogAction
                                                                                 className='bg-red text-white'
                                                                                 onClick={() => {
-                                                                                    handleDeleteIncoming(
-                                                                                        prop.incoming_item_id,
+                                                                                    handleDeleteOutgoing(
+                                                                                        prop.outgoing_item_id,
                                                                                         prop.warehouse_id
                                                                                     );
                                                                                 }}
@@ -576,20 +587,50 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                 setItemState(e);
                                             }}
                                         >
-                                            <SelectTrigger className='w-[35%]'>
+                                            <SelectTrigger className='w-[55%] h-fit'>
                                                 <SelectValue placeholder='Select Item' />
                                             </SelectTrigger>
 
                                             <SelectContent className='bg-cardBlack text-white'>
                                                 <ScrollArea className='h-40'>
-                                                    {props.items.map((prop) => (
-                                                        <SelectItem
-                                                            key={prop.item_id.toString()}
-                                                            value={prop.item_id.toString()}
-                                                        >
-                                                            {prop.item_name}
-                                                        </SelectItem>
-                                                    ))}
+                                                    {props.warehouse
+                                                        .filter((e) => {
+                                                            return (
+                                                                e.warehouse_quantity >
+                                                                0
+                                                            );
+                                                        })
+                                                        .map((prop) => (
+                                                            <SelectItem
+                                                                key={prop.warehouse_id.toString()}
+                                                                value={prop.warehouse_id.toString()}
+                                                                className='hover:bg-cardGray transition-all'
+                                                            >
+                                                                <div className='flex flex-col gap-2 '>
+                                                                    <h4 className='font-bold'>
+                                                                        {
+                                                                            prop
+                                                                                .item_table
+                                                                                .item_name
+                                                                        }
+                                                                    </h4>
+                                                                    <p>
+                                                                        Warehouse
+                                                                        ID :{' '}
+                                                                        {
+                                                                            prop.warehouse_id
+                                                                        }
+                                                                    </p>
+                                                                    <p>
+                                                                        Quantity
+                                                                        :{' '}
+                                                                        {
+                                                                            prop.warehouse_quantity
+                                                                        }
+                                                                    </p>
+                                                                </div>
+                                                            </SelectItem>
+                                                        ))}
                                                 </ScrollArea>
                                             </SelectContent>
                                         </Select>
@@ -617,7 +658,7 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                 className='bg-bluePrimary w-1/6 hover:scale-105 transition-all hover:shadow-bluePrimary hover:shadow-md '
                                                 onClick={() => handleSubmit()}
                                             >
-                                                Add Incoming Item
+                                                Add Outgoing Item
                                             </Button>
                                         </div>
                                     </motion.div>
@@ -646,7 +687,7 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                         prop.warehouse_table.item_table
                                             .item_name
                                     }
-                                    quantity={prop.incoming_item_quantity.toString()}
+                                    quantity={prop.outgoing_item_quantity.toString()}
                                     // status={prop.status?.toString()}
                                 ></CardWarehouse>
                             ))}
@@ -658,4 +699,4 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
     );
 };
 
-export default Incoming;
+export default Outgoing;

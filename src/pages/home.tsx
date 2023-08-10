@@ -192,7 +192,7 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                     </motion.div>
                 </div>
                 <div className='py-16 px-10'>
-                    <div className='bg-cardBlack rounded-xl h-72 w-[40rem] py-6'>
+                    <div className='bg-cardBlack rounded-xl h-72 w-[20rem] sm-w-[40rem] py-6'>
                         <ChartHome data={data}></ChartHome>
                     </div>
                 </div>
@@ -216,7 +216,7 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                         <motion.p
                             initial={{ opacity: 0 }}
                             whileInView={{ opacity: 1 }}
-                            className='w-1/2'
+                            className='sm:w-1/2'
                         >
                             This website are an{' '}
                             <span className='text-white'>

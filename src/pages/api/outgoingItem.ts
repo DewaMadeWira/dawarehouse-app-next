@@ -7,18 +7,18 @@ export default async function handler(
     res: NextApiResponse
 ) {
     if (req.method === 'POST') {
-        const quantity = req.body.quantity;
-        const itemId = req.body.item;
-        // res.redirect(302, `${quantity}`);
+        const quantity = parseInt(req.body.quantity);
+        const itemId = parseInt(req.body.itemId);
+        // res.redirect(302, `${itemId}`);
+        // return res.json({message:itemId})
 
         await prisma.warehouse_table.update({
             where: {
-                // from select warehouse
-                warehouse_id: +itemId,
+                warehouse_id: itemId,
             },
             data: {
                 warehouse_quantity: {
-                    decrement: +quantity,
+                    decrement: quantity,
                 },
             },
         });
@@ -30,12 +30,12 @@ export default async function handler(
 
         await prisma.outgoing_item_table.create({
             data: {
-                warehouse_id: +itemId,
-                outgoing_item_quantity: +quantity,
+                warehouse_id: itemId,
+                outgoing_item_quantity: quantity,
             },
         });
 
-        await res.revalidate('/');
+        await res.revalidate('/outgoing');
         return res.json({ revalidated: true });
     }
 }

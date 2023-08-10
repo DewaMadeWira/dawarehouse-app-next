@@ -356,96 +356,6 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                             </TableCell>
                                                         </TableRow>
                                                     ))}
-
-                                                {/* {sortSelect == 'descending'
-                                                ? props.warehouseItems
-                                                      .sort((a, b) => {
-                                                          return (
-                                                              b.warehouse_id -
-                                                              a.warehouse_id
-                                                          );
-                                                      })
-                                                      .map((prop) => (
-                                                          <TableRow
-                                                              key={
-                                                                  prop.warehouse_id
-                                                              }
-                                                          >
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop.warehouse_id
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop
-                                                                          .item_table
-                                                                          .item_name
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop.warehouse_quantity
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop
-                                                                          .item_table
-                                                                          .item_category
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {statusBadge(
-                                                                      prop.status
-                                                                  )}
-                                                              </TableCell>
-                                                          </TableRow>
-                                                      ))
-                                                : props.warehouseItems
-                                                      .sort((a, b) => {
-                                                          return (
-                                                              a.warehouse_id -
-                                                              b.warehouse_id
-                                                          );
-                                                      })
-                                                      .map((prop) => (
-                                                          <TableRow
-                                                              key={
-                                                                  prop.warehouse_id
-                                                              }
-                                                          >
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop.warehouse_id
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop
-                                                                          .item_table
-                                                                          .item_name
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop.warehouse_quantity
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {
-                                                                      prop
-                                                                          .item_table
-                                                                          .item_category
-                                                                  }
-                                                              </TableCell>
-                                                              <TableCell className=''>
-                                                                  {statusBadge(
-                                                                      prop.status
-                                                                  )}
-                                                              </TableCell>
-                                                          </TableRow>
-                                                      ))} */}
                                             </TableBody>
                                         </Table>
                                     </motion.div>
@@ -460,51 +370,76 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                     <div className='p-6 w-full'>
                         <h2 className='text-3xl font-bold'>Warehouse</h2>
                         <div className='flex gap-5 mt-10 justify-end'>
-                            <Select>
-                                <SelectTrigger className='w-fit border-bluePrimary'>
-                                    <SelectValue placeholder='Status' />
-                                </SelectTrigger>
-                                <SelectContent className='bg-cardBlack text-white font-outfit'>
-                                    <SelectItem value='light'>Light</SelectItem>
-                                    <SelectItem value='dark'>Dark</SelectItem>
-                                    <SelectItem value='system'>
-                                        System
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Select>
-                                <SelectTrigger className='w-fit border-bluePrimary'>
-                                    <SelectValue placeholder='Item' />
-                                </SelectTrigger>
-                                <SelectContent className='bg-cardBlack text-white font-outfit'>
-                                    <SelectItem value='light'>Light</SelectItem>
-                                    <SelectItem value='dark'>Dark</SelectItem>
-                                    <SelectItem value='system'>
-                                        System
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Select>
-                                <SelectTrigger className='w-fit border-bluePrimary'>
-                                    <SelectValue placeholder='Sort' />
-                                </SelectTrigger>
-                                <SelectContent className='bg-cardBlack text-white font-outfit'>
-                                    <SelectItem value='light'>Light</SelectItem>
-                                    <SelectItem value='dark'>Dark</SelectItem>
-                                    <SelectItem value='system'>
-                                        System
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <SelectComponent
+                                data={data}
+                                setData={setData}
+                                setSortSelect={setSortSelect}
+                                dataType='warehouse'
+                            />
+                            <StatusCheckBox
+                                statusCheckbox={statusCheckbox}
+                                setStatusCheckbox={setStatusCheckbox}
+                            />
                         </div>
                         <div className='w-full mt-10 flex flex-col gap-7'>
-                            {props.warehouseItems.map((prop) => (
-                                <CardWarehouse
-                                    name={prop.item_table.item_name}
-                                    quantity={prop.warehouse_quantity.toString()}
-                                    status={prop.status?.toString()}
-                                ></CardWarehouse>
-                            ))}
+                            {data
+                                ?.filter((e) => {
+                                    if (
+                                        statusCheckbox.empty == true &&
+                                        statusCheckbox.inStock == true &&
+                                        statusCheckbox.needRestock == true
+                                    ) {
+                                        return e;
+                                    }
+
+                                    if (
+                                        statusCheckbox.empty &&
+                                        statusCheckbox.inStock
+                                    ) {
+                                        return (
+                                            e.status == 'Empty' ||
+                                            e.status == 'In-stock'
+                                        );
+                                    }
+                                    if (
+                                        statusCheckbox.empty &&
+                                        statusCheckbox.needRestock
+                                    ) {
+                                        return (
+                                            e.status == 'Empty' ||
+                                            e.status == 'Need Restock'
+                                        );
+                                    }
+                                    if (
+                                        statusCheckbox.inStock &&
+                                        statusCheckbox.needRestock
+                                    ) {
+                                        return (
+                                            e.status == 'In-stock' ||
+                                            e.status == 'Need Restock'
+                                        );
+                                    }
+
+                                    if (statusCheckbox.inStock) {
+                                        return e.status == 'In-stock';
+                                    }
+                                    if (statusCheckbox.needRestock) {
+                                        return e.status == 'Need Restock';
+                                    }
+                                    if (statusCheckbox.empty) {
+                                        return e.status == 'Empty';
+                                    }
+
+                                    return;
+                                })
+                                .map((prop: any) => (
+                                    <CardWarehouse
+                                        name={prop.item_table.item_name}
+                                        quantity={prop.warehouse_quantity.toString()}
+                                        status={prop.status?.toString()}
+                                    ></CardWarehouse>
+                                ))}
+                         
                         </div>
                     </div>
                 </>
