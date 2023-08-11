@@ -502,8 +502,6 @@ const Incoming: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                                 sure
                                                                                 to
                                                                                 delete
-                                                                                an
-                                                                                delete
                                                                                 an{' '}
                                                                                 <span className='font-bold'>
                                                                                     Incoming

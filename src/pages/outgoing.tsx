@@ -539,29 +539,23 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                                 sure
                                                                                 to
                                                                                 delete
-                                                                                an
-                                                                                delete
                                                                                 an{' '}
                                                                                 <span className='font-bold'>
-                                                                                    Incoming
+                                                                                    Outgoing
                                                                                     Item
                                                                                 </span>{' '}
                                                                                 ?
                                                                             </AlertDialogTitle>
                                                                             <AlertDialogDescription>
                                                                                 This
-                                                                                will
-                                                                                make
-                                                                                the
-                                                                                item
-                                                                                on
-                                                                                the
-                                                                                warehouse{' '}
+                                                                                will{' '}
                                                                                 <span className='font-bold'>
-                                                                                    deleted
+                                                                                    undo
                                                                                 </span>
-
-                                                                                .
+                                                                                the
+                                                                                Outgoing
+                                                                                item
+                                                                                .{' '}
                                                                                 Action
                                                                                 cannot
                                                                                 be

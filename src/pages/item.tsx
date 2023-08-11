@@ -198,76 +198,92 @@ const Item: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
         setData(props.items);
     });
 
-    async function handleDeleteOutgoing(itemId: number, warehouseId: number) {
-        const res = await fetch('/api/deleteOutgoing', {
+    async function handleDelete(itemId: number) {
+        const res = await fetch('/api/deleteItem', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                itemId: itemId,
-                warehouseId: warehouseId,
+                id: itemId,
             }),
         });
 
+        if (res.status == 400) {
+            toast({
+                description: 'Delete Fails  !',
+                className: 'bg-red p-5 font-outfit border-none ',
+            });
+            return;
+        }
+
         if (res.json != null) {
-            // alert('refresh called');
-            // setData((current) =>
-            //     current?.filter((prop) => {
-            //         return (
-            //             prop.warehouse_id != warehouseId &&
-            //             prop.incoming_item_id != itemId
-            //         );
-            //     })
-            // );
+            setName('');
+            setItemState('');
+            setCategory('');
+            setPrice('');
             refreshData();
+            setData(props.items);
         }
     }
 
-    // async function handleSubmit() {
-    //     if (quantityState == '' || quantityState == '0') {
-    //         // console.log('quantity 0');
-    //         //
-    //         toast({
-    //             description: 'Quantity cannot be 0 or negative (-1) !',
-    //             className: 'bg-yellow p-5 font-outfit border-none ',
-    //         });
-    //         return;
-    //     }
-    //     if (itemState == '') {
-    //         toast({
-    //             description: 'Please select an item !',
-    //             className: 'bg-yellow p-5 font-outfit border-none ',
-    //         });
-    //         return;
-    //     }
-    //     // alert(quantityState + ' ' + itemState);
+    async function handleSubmit() {
+        if (name == '') {
+            // console.log('quantity 0');
+            //
+            toast({
+                description: 'Item name cannot be empty  !',
+                className: 'bg-yellow p-5 font-outfit border-none ',
+            });
+            return;
+        }
+        if (category == '') {
+            // console.log('quantity 0');
+            //
+            toast({
+                description: 'Item category cannot be empty  !',
+                className: 'bg-yellow p-5 font-outfit border-none ',
+            });
+            return;
+        }
+        if (price == '' || price == '0') {
+            // console.log('quantity 0');
+            //
+            toast({
+                description: 'Item price cannot be empty  or negative (-)!',
+                className: 'bg-yellow p-5 font-outfit border-none ',
+            });
+            return;
+        }
 
-    //     const res = await fetch('/api/outgoingItem', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //         },
-    //         body: JSON.stringify({
-    //             itemId: itemState,
-    //             quantity: quantityState,
-    //         }),
-    //     });
+        const res = await fetch('/api/addItem', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: name,
+                category: category,
+                price: price,
+            }),
+        });
+        if (res.status == 400) {
+            toast({
+                description: 'Create New Fails  !',
+                className: 'bg-red p-5 font-outfit border-none ',
+            });
+            return;
+        }
 
-    //     if (res.status == 400) {
-    //         toast({
-    //             description: 'Quantity Insufficient !',
-    //             className: 'bg-red p-5 font-outfit border-none ',
-    //         });
-    //         return;
-    //     }
-
-    //     if (res.status == 200) {
-    //         setQuantityState('');
-    //         refreshData();
-    //         setData(props.items);
-    //     }
-    // }
+        if (res.json != null) {
+            setName('');
+            setItemState('');
+            setCategory('');
+            setPrice('');
+            refreshData();
+            setData(props.items);
+        }
+    }
 
     async function handleEdit(itemId: number) {
         if (name == '') {
@@ -606,11 +622,8 @@ const Item: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                                 sure
                                                                                 to
                                                                                 delete
-                                                                                an
-                                                                                delete
                                                                                 an{' '}
                                                                                 <span className='font-bold'>
-                                                                                    Incoming
                                                                                     Item
                                                                                 </span>{' '}
                                                                                 ?
@@ -620,15 +633,17 @@ const Item: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                                 will
                                                                                 make
                                                                                 the
-                                                                                item
-                                                                                on
-                                                                                the
-                                                                                warehouse{' '}
+                                                                                item{' '}
                                                                                 <span className='font-bold'>
                                                                                     deleted
-                                                                                </span>
-
-                                                                                .
+                                                                                </span>{' '}
+                                                                                from
+                                                                                the
+                                                                                list
+                                                                                .{' '}
+                                                                                {
+                                                                                    '(record still exist even when item deleted) '
+                                                                                }
                                                                                 Action
                                                                                 cannot
                                                                                 be
@@ -642,8 +657,7 @@ const Item: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                             <AlertDialogAction
                                                                                 className='bg-red text-white'
                                                                                 onClick={() => {
-                                                                                    handleDeleteOutgoing(
-                                                                                        prop.item_id,
+                                                                                    handleDelete(
                                                                                         prop.item_id
                                                                                     );
                                                                                 }}
@@ -672,76 +686,86 @@ const Item: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                         transition={{ duration: 0.4 }}
                                         className='px-9 flex flex-col gap-3'
                                     >
-                                        <h2 className='text-lg'>
-                                            Select an Item :
-                                        </h2>
-                                        {/* <Select
-                                            onValueChange={(e) => {
-                                                setItemState(e);
-                                            }}
-                                        >
-                                            <SelectTrigger className='w-[55%] h-fit'>
-                                                <SelectValue placeholder='Select Item' />
-                                            </SelectTrigger>
+                                        <div className='flex flex-col gap-5'>
+                                            <label
+                                                htmlFor='name'
+                                                className='text-xl'
+                                            >
+                                                Name :
+                                            </label>
+                                            <input
+                                                onChange={(e) => {
+                                                    setName(e.target.value);
+                                                }}
+                                                id='name'
+                                                className=' px-2 bg-cardBlack text-white border-none rounded-md outline-none w-1/2 h-14'
+                                                type='text'
+                                                placeholder='GTX 950'
+                                                min={0}
+                                            />
+                                            <label
+                                                htmlFor='category'
+                                                className='text-xl'
+                                            >
+                                                Category :
+                                            </label>
+                                            <Select
+                                                onValueChange={(e) => {
+                                                    setCategory(e);
+                                                }}
+                                            >
+                                                <SelectTrigger className='w-[180px] border-bluePrimary outline-none'>
+                                                    <SelectValue placeholder='Category' />
+                                                </SelectTrigger>
+                                                <SelectContent className='h-40 bg-cardBlack text-white'>
+                                                    <SelectItem value='Graphic Card'>
+                                                        Graphic Card
+                                                    </SelectItem>
+                                                    <SelectItem value='CPU'>
+                                                        CPU
+                                                    </SelectItem>
+                                                    <SelectItem value='RAM'>
+                                                        RAM
+                                                    </SelectItem>
+                                                    <SelectItem value='SSD'>
+                                                        SSD
+                                                    </SelectItem>
+                                                    <SelectItem value='Mechanical Keyboard'>
+                                                        Mechanical Keyboard
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
 
-                                            <SelectContent className='bg-cardBlack text-white'>
-                                                <ScrollArea className='h-40'>
-                                                    {props.items.map((prop) => (
-                                                        <SelectItem
-                                                            key={prop.item_id.toString()}
-                                                            value={prop.item_id.toString()}
-                                                            className='hover:bg-cardGray transition-all'
-                                                        >
-                                                            <div className='flex flex-col gap-2 '>
-                                                                <h4 className='font-bold'>
-                                                                    {
-                                                                        prop
-                                                                    }
-                                                                </h4>
-                                                                <p>
-                                                                    Warehouse ID
-                                                                    :{' '}
-                                                                    {
-                                                                        prop.warehouse_id
-                                                                    }
-                                                                </p>
-                                                                <p>
-                                                                    Quantity :{' '}
-                                                                    {
-                                                                        prop.warehouse_quantity
-                                                                    }
-                                                                </p>
-                                                            </div>
-                                                        </SelectItem>
-                                                    ))}
-                                                </ScrollArea>
-                                            </SelectContent>
-                                        </Select> */}
-                                        <h2 className='text-lg'>
-                                            Add Quantity :
-                                        </h2>
-                                        <Input
-                                            onChange={(e) => {
-                                                // setQuantityState(
-                                                //     e.target.value
-                                                // );
-                                            }}
-                                            name='quantity'
-                                            className='bg-cardBlack w-1/4'
-                                            placeholder='30'
-                                            // onChange={(e) =>
-                                            //     setQuantityState(e.target.value)
-                                            // }
-                                            type='number'
-                                            min={0}
-                                            required
-                                        />
+                                            <label
+                                                htmlFor='price'
+                                                className='text-xl'
+                                            >
+                                                Price :
+                                            </label>
+                                            <div className='flex'>
+                                                <p className='mr-4'>Rp: </p>
+                                                <input
+                                                    onChange={(e) => {
+                                                        setPrice(
+                                                            e.target.value
+                                                        );
+                                                    }}
+                                                    id='price'
+                                                    className=' px-2 w-1/3 bg-cardBlack text-white rounded-md outline-none h-12'
+                                                    type='number'
+                                                    placeholder='2000'
+                                                    min={0}
+                                                />
+                                            </div>
+                                        </div>
                                         <div className='flex justify-end'>
                                             <Button
                                                 className='bg-bluePrimary w-1/6 hover:scale-105 transition-all hover:shadow-bluePrimary hover:shadow-md '
-                                                onClick={() => {}}
+                                                onClick={() => {
+                                                    handleSubmit();
+                                                }}
                                             >
-                                                Add Outgoing Item
+                                                Add New Item
                                             </Button>
                                         </div>
                                     </motion.div>
