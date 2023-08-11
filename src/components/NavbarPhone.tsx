@@ -108,7 +108,7 @@ const NavbarPhone = ({ isWarehouse }: NavbarType) => {
                     </Link>
 
                     <hr className=' border-gray' />
-                    <Link href={'/about'}>
+                    <Link href={'/home/#about'}>
                         <h5 className='text-lg'>About</h5>
                     </Link>
                 </PopoverContent>

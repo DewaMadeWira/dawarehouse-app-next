@@ -192,12 +192,17 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                     </motion.div>
                 </div>
                 <div className='py-16 px-10'>
-                    <div className='bg-cardBlack rounded-xl h-72 w-[20rem] sm-w-[40rem] py-6'>
+                    <motion.div
+                        initial={{ opacity: 0, x: -100 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.45 }}
+                        className='bg-cardBlack rounded-xl h-80 w-[20rem] sm:w-[37rem] py-6'
+                    >
                         <ChartHome data={data}></ChartHome>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
-            <div className='h-screen bg-bgBlack'>
+            <div className='h-screen bg-bgBlack' id='about'>
                 <div className='p-16 '>
                     <motion.h1
                         initial={{ opacity: 0, x: -100 }}

@@ -42,7 +42,7 @@ const Navbar = ({ isWarehouse }: NavbarType) => {
 
                 <hr className=' border-gray' />
                 <Link
-                    href={'/about'}
+                    href={'/home/#about'}
                     className='border-b-2 border-bgBlack hover:border-b-white transition-all '
                 >
                     <h5 className='text-lg'>About</h5>
