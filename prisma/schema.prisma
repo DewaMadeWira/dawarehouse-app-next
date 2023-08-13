@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -32,7 +32,7 @@ model outgoing_item_table {
   outgoing_item_date     DateTime?       @default(now())
   warehouse_table        warehouse_table @relation(fields: [warehouse_id], references: [warehouse_id], onUpdate: Restrict, map: "outgoing_item_table_ibfk_1")
 
-  @@index([warehouse_id], map: "warehouse_id")
+  @@index([warehouse_id], map: "warehouse_id_fk")
 }
 
 model warehouse_table {
