@@ -11,6 +11,7 @@ import ChartHome from '@/components/ChartHome';
 import { prisma } from '../../db/client';
 import { GetStaticProps, InferGetStaticPropsType, NextPage } from 'next';
 import { Prisma } from '@prisma/client';
+import Head from 'next/head';
 
 const DynamicHeader = dynamic(() => import('@/components/Navbar'), {
     loading: () => <p>Loading...</p>,
@@ -135,6 +136,10 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
 
     return (
         <div className={`min-h-screen bg-bgBlack text-white font-outfit`}>
+            <Head>
+                <title>DaWarehouse | Home</title>
+                <link rel="icon" type="image/x-icon" href="/logo.png"></link>
+            </Head>
             {windowWidth >= 700 ? (
                 // <h1>testing</h1>
                 <Navbar isWarehouse={false}></Navbar>

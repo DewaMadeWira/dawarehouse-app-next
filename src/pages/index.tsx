@@ -51,6 +51,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import Head from 'next/head';
 
 
 async function getItem() {
@@ -235,6 +236,10 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
 
     return (
         <main className='min-h-screen bg-bgBlack flex items-center flex-col justify-around'>
+            <Head>
+                <title>DaWarehouse | Warehouse</title>
+                <link rel='icon' type='image/x-icon' href='/logo.png'></link>
+            </Head>
             <div className=' h-fit p-5 w-fit text-lg mt-5 bg-cardBlack border-bluePrimary border-2 rounded-lg'>
                 <h3 className='text-center font-outfit font-bold text-white '>
                     Items Table

@@ -32,6 +32,7 @@ import SidebarDesktop from '@/components/SidebarDesktop';
 import TotalBar from '@/components/TotalBar';
 import StatusCheckBox from '@/components/StatusCheckbox';
 import SelectComponent from '@/components/SelectComponent';
+import Head from 'next/head';
 
 async function getWarehouse() {
     const warehouseItems = await prisma.warehouse_table.findMany({
@@ -172,6 +173,10 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
 
     return (
         <div className='min-h-screen bg-bgBlack text-white font-outfit'>
+            <Head>
+                <title>DaWarehouse | Warehouse</title>
+                <link rel='icon' type='image/x-icon' href='/logo.png'></link>
+            </Head>
             {windowWidth >= 700 ? (
                 <div>
                     <Navbar isWarehouse={true}></Navbar>
@@ -442,7 +447,6 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                         status={prop.status?.toString()}
                                     ></CardWarehouse>
                                 ))}
-                         
                         </div>
                     </div>
                 </>
