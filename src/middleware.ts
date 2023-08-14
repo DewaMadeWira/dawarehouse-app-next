@@ -9,8 +9,8 @@ export async function middleware(request: NextRequest) {
     const res = await fetch('http://localhost:3000/api/checkDb', {
         method: 'GET',
     });
-    return NextResponse.next();
     console.log('middleware called !');
+    return NextResponse.next();
 }
 
 export const config = {

@@ -2,10 +2,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../db/client';
 
-// type Data = {
-//     message: string;
-// };
-
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
@@ -13,6 +9,16 @@ export default async function handler(
     // const outgoingId = req.body.itemId;
     // const warehouseId = req.body.warehouseId;
     if (req.method === 'GET') {
+        await prisma.warehouse_table.updateMany({
+            where: {
+                warehouse_quantity: {
+                    gt: 5,
+                },
+            },
+            data: {
+                status: 'In-stock',
+            },
+        });
         await prisma.warehouse_table.updateMany({
             where: {
                 warehouse_quantity: {
@@ -33,6 +39,9 @@ export default async function handler(
                 status: 'Empty',
             },
         });
+
+        console.log();
+
         res.send({ message: 'done!' });
     }
 }

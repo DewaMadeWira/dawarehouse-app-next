@@ -8,13 +8,13 @@ import { prisma } from '../../db/client';
 import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+// import {
+//     Select,
+//     SelectContent,
+//     SelectItem,
+//     SelectTrigger,
+//     SelectValue,
+// } from '@/components/ui/select';
 
 import {
     Table,
@@ -35,6 +35,9 @@ import SelectComponent from '@/components/SelectComponent';
 
 async function getWarehouse() {
     const warehouseItems = await prisma.warehouse_table.findMany({
+        orderBy:{
+            warehouse_id:'asc'
+        },
         include: {
             item_table: true,
         },
