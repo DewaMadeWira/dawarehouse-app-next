@@ -3,6 +3,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface NavbarType {
@@ -14,12 +15,23 @@ const Navbar = ({ isWarehouse }: NavbarType) => {
         <nav className='flex justify-between pr-6'>
             {isWarehouse ? (
                 <div className='flex items-center bg-cardBlack h-full w-1/5 pl-6 py-4 pr-10'>
-                    <img src='/logo.png' alt='' />
+                    <Image
+                        src='/logo.png'
+                        alt='logo'
+                        width={50}
+                        height={50}
+                    ></Image>
+
                     <h4 className='font-bold text-xl ml-2'>DaWarehouse</h4>
                 </div>
             ) : (
                 <div className='flex items-center pl-6'>
-                    <img src='/logo.png' alt='' />
+                    <Image
+                        src='/logo.png'
+                        alt='logo'
+                        width={50}
+                        height={50}
+                    ></Image>
                     <h4 className='font-bold text-xl ml-2'>DaWarehouse</h4>
                 </div>
             )}

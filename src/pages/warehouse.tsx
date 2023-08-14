@@ -36,8 +36,8 @@ import Head from 'next/head';
 
 async function getWarehouse() {
     const warehouseItems = await prisma.warehouse_table.findMany({
-        orderBy:{
-            warehouse_id:'asc'
+        orderBy: {
+            warehouse_id: 'asc',
         },
         include: {
             item_table: true,
@@ -143,6 +143,7 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
 
     useEffect(() => {
         setData(props.warehouseItems);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     function statusBadge(status: string | null) {
@@ -442,6 +443,7 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                 })
                                 .map((prop: any) => (
                                     <CardWarehouse
+                                        key={prop.item_table.item_name}
                                         name={prop.item_table.item_name}
                                         quantity={prop.warehouse_quantity.toString()}
                                         status={prop.status?.toString()}

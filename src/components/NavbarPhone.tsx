@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/sheet';
 import Link from 'next/link';
 
+import Image from 'next/image';
+
 interface NavbarType {
     isWarehouse: boolean;
 }
@@ -25,7 +27,12 @@ const NavbarPhone = ({ isWarehouse }: NavbarType) => {
                 <Sheet>
                     <SheetTrigger>
                         <div className='flex items-center'>
-                            <img src='/logo.png' alt='' />
+                            <Image
+                                src='/logo.png'
+                                alt=''
+                                width={50}
+                                height={50}
+                            />
                             {isWarehouse ? (
                                 <span></span>
                             ) : (
@@ -43,38 +50,43 @@ const NavbarPhone = ({ isWarehouse }: NavbarType) => {
                             <SheetDescription>
                                 <div className='flex flex-col gap-10'>
                                     <Link href={'/'}>
-                                        <img
+                                        <Image
                                             src='/logo.png'
                                             width={55}
-                                            alt=''
+                                            height={55}
+                                            alt='logo'
                                         />
                                     </Link>
                                     <Link href={'/warehouse'}>
-                                        <img
+                                        <Image
                                             src='/warehouse.png'
                                             width={55}
-                                            alt=''
+                                            height={55}
+                                            alt='warehouse'
                                         />
                                     </Link>
                                     <Link href={'/incoming'}>
-                                        <img
+                                        <Image
                                             src='/incoming.png'
                                             width={55}
-                                            alt=''
+                                            height={55}
+                                            alt='incoming'
                                         />
                                     </Link>
                                     <Link href={'/outgoing'}>
-                                        <img
+                                        <Image
                                             src='/outgoing.png'
                                             width={55}
-                                            alt=''
+                                            height={55}
+                                            alt='outgoing'
                                         />
                                     </Link>
                                     <Link href={'/item'}>
-                                        <img
+                                        <Image
                                             src='/item.png'
                                             width={55}
-                                            alt=''
+                                            height={55}
+                                            alt='item'
                                         />
                                     </Link>
                                 </div>
@@ -84,7 +96,7 @@ const NavbarPhone = ({ isWarehouse }: NavbarType) => {
                 </Sheet>
             ) : (
                 <div className='flex items-center'>
-                    <img src='/logo.png' alt='' />
+                    <Image src='/logo.png' alt='' width={50} height={50} />
                     {isWarehouse ? (
                         <span></span>
                     ) : (
@@ -95,7 +107,12 @@ const NavbarPhone = ({ isWarehouse }: NavbarType) => {
 
             <Popover>
                 <PopoverTrigger>
-                    <img src='/hamburger.png' width={40} alt='' />
+                    <Image
+                        src='/hamburger.png'
+                        alt='logo'
+                        width={40}
+                        height={40}
+                    ></Image>
                 </PopoverTrigger>
                 <PopoverContent className='bg-cardBlack text-white font-outfit w-32 mr-5 flex flex-col gap-2'>
                     <Link href={'/'}>

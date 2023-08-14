@@ -3,6 +3,7 @@ import { NavbarContext } from '@/context/NavbarContext';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 const SidebarDesktop = () => {
     //  const [path, setPath] = useState('');
@@ -12,6 +13,7 @@ const SidebarDesktop = () => {
 
     useEffect(() => {
         setNavbarValue(window.location.pathname.substring(1));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // function changeSide(value: string) {
@@ -35,7 +37,12 @@ const SidebarDesktop = () => {
                     navbarValue == 'warehouse' ? 'bg-cardGray font-bold' : ''
                 }`}
             >
-                <img src='/warehouse.png' width={35} alt='' />
+                <Image
+                    src='/warehouse.png'
+                    width={35}
+                    alt='warehouse'
+                    height={35}
+                />
                 <h4 className='text-lg'>Warehouse</h4>
             </button>
             {/* Incoming */}
@@ -48,7 +55,12 @@ const SidebarDesktop = () => {
                     navbarValue == 'incoming' ? 'bg-cardGray font-bold ' : ''
                 } `}
             >
-                <img src='/incoming.png' width={35} alt='' />
+                <Image
+                    src='/incoming.png'
+                    width={35}
+                    alt='incoming'
+                    height={35}
+                />
                 <h4 className='text-lg'>Incoming</h4>
             </button>
             {/* Outgoing */}
@@ -61,7 +73,12 @@ const SidebarDesktop = () => {
                     navbarValue == 'outgoing' ? 'bg-cardGray font-bold' : ''
                 } `}
             >
-                <img src='/warehouse.png' width={35} alt='' />
+                <Image
+                    src='/warehouse.png'
+                    width={35}
+                    alt='warehouse'
+                    height={35}
+                />
                 <h4 className='text-lg'>Outgoing</h4>
             </button>
             <button
@@ -73,7 +90,7 @@ const SidebarDesktop = () => {
                     navbarValue == 'item' ? 'bg-cardGray font-bold' : ''
                 } `}
             >
-                <img src='/item.png' width={35} alt='' />
+                <Image src='/item.png' width={35} alt='item' height={35} />
                 <h4 className='text-lg'>Item</h4>
             </button>
         </motion.div>

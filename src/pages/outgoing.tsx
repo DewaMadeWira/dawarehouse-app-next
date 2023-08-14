@@ -63,6 +63,7 @@ import {
 import { Button } from '@/components/ui/button';
 import CardWarehouse from '@/components/CardWarehouse';
 import Head from 'next/head';
+import Image from 'next/image';
 
 async function getOutgoingItems() {
     const incomingItems = await prisma.outgoing_item_table.findMany({
@@ -201,6 +202,7 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
 
     useEffect(() => {
         setData(props.outgoingItems);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     });
 
     async function handleDeleteOutgoing(itemId: number, warehouseId: number) {
@@ -437,9 +439,15 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                     <DialogTrigger
                                                                         asChild
                                                                     >
-                                                                        <img
+                                                                        <Image
                                                                             src='/edit_icon.png'
                                                                             alt=''
+                                                                            width={
+                                                                                20
+                                                                            }
+                                                                            height={
+                                                                                20
+                                                                            }
                                                                         />
                                                                     </DialogTrigger>
                                                                     <DialogContent className='sm:max-w-[425px]'>
@@ -447,12 +455,11 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                             <DialogTitle>
                                                                                 Edit
                                                                                 Item
-                                                                                '
+                                                                                {`'`}
                                                                                 {
                                                                                     prop.outgoing_item_id
                                                                                 }
-
-                                                                                '
+                                                                                {`'`}
                                                                             </DialogTitle>
                                                                             <DialogDescription>
                                                                                 This
@@ -524,7 +531,7 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                             <TableCell className=''>
                                                                 <AlertDialog>
                                                                     <AlertDialogTrigger>
-                                                                        <img
+                                                                        <Image
                                                                             className='hover:-translate-y-1 transition-all '
                                                                             width={
                                                                                 20
@@ -532,7 +539,7 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                                                             height={
                                                                                 20
                                                                             }
-                                                                            src='delete_icon.png'
+                                                                            src='/delete_icon.png'
                                                                             alt='delete icon'
                                                                         />
                                                                     </AlertDialogTrigger>
@@ -708,6 +715,10 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                         <div className='w-full mt-10 flex flex-col gap-7'>
                             {data?.map((prop) => (
                                 <CardWarehouse
+                                    key={
+                                        prop.warehouse_table.item_table
+                                            .item_name
+                                    }
                                     name={
                                         prop.warehouse_table.item_table
                                             .item_name
