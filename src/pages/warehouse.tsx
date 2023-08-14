@@ -8,13 +8,13 @@ import { prisma } from '../../db/client';
 import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+// import {
+//     Select,
+//     SelectContent,
+//     SelectItem,
+//     SelectTrigger,
+//     SelectValue,
+// } from '@/components/ui/select';
 
 import {
     Table,
@@ -32,9 +32,13 @@ import SidebarDesktop from '@/components/SidebarDesktop';
 import TotalBar from '@/components/TotalBar';
 import StatusCheckBox from '@/components/StatusCheckbox';
 import SelectComponent from '@/components/SelectComponent';
+import Head from 'next/head';
 
 async function getWarehouse() {
     const warehouseItems = await prisma.warehouse_table.findMany({
+        orderBy:{
+            warehouse_id:'asc'
+        },
         include: {
             item_table: true,
         },
@@ -169,6 +173,10 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
 
     return (
         <div className='min-h-screen bg-bgBlack text-white font-outfit'>
+            <Head>
+                <title>DaWarehouse | Warehouse</title>
+                <link rel='icon' type='image/x-icon' href='/logo.png'></link>
+            </Head>
             {windowWidth >= 700 ? (
                 <div>
                     <Navbar isWarehouse={true}></Navbar>
@@ -439,7 +447,6 @@ const Warehouse: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
                                         status={prop.status?.toString()}
                                     ></CardWarehouse>
                                 ))}
-                         
                         </div>
                     </div>
                 </>

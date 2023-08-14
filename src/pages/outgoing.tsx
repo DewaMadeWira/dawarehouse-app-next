@@ -62,6 +62,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import CardWarehouse from '@/components/CardWarehouse';
+import Head from 'next/head';
 
 async function getOutgoingItems() {
     const incomingItems = await prisma.outgoing_item_table.findMany({
@@ -311,6 +312,10 @@ const Outgoing: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
 
     return (
         <main className='min-h-screen bg-bgBlack text-white font-outfit'>
+            <Head>
+                <title>DaWarehouse | Outgoing</title>
+                <link rel='icon' type='image/x-icon' href='/logo.png'></link>
+            </Head>
             {windowWidth >= 700 ? (
                 <div>
                     <Navbar isWarehouse={true}></Navbar>
