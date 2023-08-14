@@ -2,11 +2,15 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { prisma } from '../db/client';
 
-import { env } from 'process';
-
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
-    const res = await fetch('http://localhost:3000/api/checkDb', {
+    const link = process.env.CHECK_URL;
+
+    if (link == undefined) {
+        console.log('link not found');
+        return;
+    }
+    const res = await fetch(link, {
         method: 'GET',
     });
     console.log('middleware called !');
