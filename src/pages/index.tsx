@@ -1,7 +1,7 @@
 import Navbar from '@/components/Navbar';
 import NavbarPhone from '@/components/NavbarPhone';
 import { Button } from '@/components/ui/button';
-import dynamic from 'next/dynamic';
+// import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
@@ -11,18 +11,16 @@ import ChartHome from '@/components/ChartHome';
 import { prisma } from '../../db/client';
 import {
     GetServerSideProps,
-    GetStaticProps,
     InferGetServerSidePropsType,
-    InferGetStaticPropsType,
     NextPage,
 } from 'next';
 import { Prisma } from '@prisma/client';
 import Head from 'next/head';
 import Link from 'next/link';
 
-const DynamicHeader = dynamic(() => import('@/components/Navbar'), {
-    loading: () => <p>Loading...</p>,
-});
+// const DynamicHeader = dynamic(() => import('@/components/Navbar'), {
+//     loading: () => <p>Loading...</p>,
+// });
 
 async function getWarehouseSum() {
     const data = await prisma.warehouse_table.aggregate({

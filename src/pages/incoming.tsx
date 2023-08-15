@@ -3,8 +3,6 @@ import Navbar from '@/components/Navbar';
 import NavbarPhone from '@/components/NavbarPhone';
 import { useEffect, useState } from 'react';
 import type {
-    InferGetStaticPropsType,
-    GetStaticProps,
     NextPage,
     InferGetServerSidePropsType,
     GetServerSideProps,

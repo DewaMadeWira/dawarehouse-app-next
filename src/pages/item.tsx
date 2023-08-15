@@ -3,8 +3,6 @@ import Navbar from '@/components/Navbar';
 import NavbarPhone from '@/components/NavbarPhone';
 import { useEffect, useState } from 'react';
 import type {
-    InferGetStaticPropsType,
-    GetStaticProps,
     NextPage,
     InferGetServerSidePropsType,
     GetServerSideProps,
@@ -26,8 +24,6 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-import { ScrollArea } from '@/components/ui/scroll-area';
-
 import {
     Select,
     SelectContent,
@@ -36,7 +32,6 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 
-import { Input } from '@/components/ui/input';
 
 import {
     Table,

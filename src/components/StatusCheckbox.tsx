@@ -1,12 +1,6 @@
 import { motion } from 'framer-motion';
 
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectTrigger } from '@/components/ui/select';
 
 interface StatusType {
     inStock: boolean;

@@ -3,8 +3,6 @@ import NavbarPhone from '@/components/NavbarPhone';
 import CardWarehouse from '@/components/CardWarehouse';
 import { useEffect, useState } from 'react';
 import type {
-    InferGetStaticPropsType,
-    GetStaticProps,
     NextPage,
     GetServerSideProps,
     InferGetServerSidePropsType,
