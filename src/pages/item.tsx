@@ -285,6 +285,10 @@ const Item: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
             setPrice('');
             refreshData();
             setData(props.items);
+            toast({
+                description: 'Data Created  !',
+                className: 'bg-green p-5 font-outfit border-none ',
+            });
         }
     }
 
@@ -345,10 +349,6 @@ const Item: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
             setPrice('');
             refreshData();
             setData(props.items);
-            toast({
-                description: 'Data Created  !',
-                className: 'bg-green p-5 font-outfit border-none ',
-            });
         }
     }
 
