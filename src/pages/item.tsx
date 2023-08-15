@@ -2,7 +2,13 @@ import { useRouter } from 'next/router';
 import Navbar from '@/components/Navbar';
 import NavbarPhone from '@/components/NavbarPhone';
 import { useEffect, useState } from 'react';
-import type { InferGetStaticPropsType, GetStaticProps, NextPage } from 'next';
+import type {
+    InferGetStaticPropsType,
+    GetStaticProps,
+    NextPage,
+    InferGetServerSidePropsType,
+    GetServerSideProps,
+} from 'next';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../db/client';
 
@@ -124,7 +130,7 @@ async function getItem() {
     return data;
 }
 
-export const getStaticProps: GetStaticProps<{
+export const getServerSideProps: GetServerSideProps<{
     // outgoingItems: Prisma.PromiseReturnType<typeof getOutgoingItems>;
     totalWarehouse: Prisma.PromiseReturnType<typeof getWarehouseSum>;
     incomingSum: Prisma.PromiseReturnType<typeof getIncomingSum>;
@@ -161,8 +167,8 @@ interface StatusType {
     empty: boolean;
 }
 
-const Item: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
-    props: InferGetStaticPropsType<typeof getStaticProps>
+const Item: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
+    props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) => {
     const router = useRouter();
 

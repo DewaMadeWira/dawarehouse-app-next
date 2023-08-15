@@ -32,7 +32,7 @@ export default async function handler(
             },
         });
 
-        await res.revalidate('/incoming');
+        // await res.revalidate('/incoming');
         return res.json({ revalidated: true });
     }
 }

@@ -42,8 +42,8 @@ export default async function handler(
                 outgoing_item_quantity: quantity,
             },
         });
-
-        await res.revalidate('/outgoing');
+        
+        // await res.revalidate('/outgoing');
         return res.status(200).json({ revalidated: true });
     }
 }

@@ -10,7 +10,6 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
-    
     const name = req.body.name;
     const category = req.body.category;
     const price = parseFloat(req.body.price);
@@ -31,6 +30,6 @@ export default async function handler(
         // console.log(data);
         // res.send({ message: data });
     }
-    await res.revalidate('/item');
+    // await res.revalidate('/item');
     return res.json({ revalidated: true });
 }

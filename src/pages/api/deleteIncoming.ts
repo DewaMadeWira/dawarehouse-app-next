@@ -39,7 +39,7 @@ export default async function handler(
                 warehouse_id: warehouseId,
             },
         });
-        res.revalidate('/incoming');
+        // res.revalidate('/incoming');
         // revalidatePath('/incoming');
         return res.json({ revalidated: true });
     }

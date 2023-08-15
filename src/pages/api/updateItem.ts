@@ -34,6 +34,6 @@ export default async function handler(
         // console.log(data);
         // res.send({ message: data });
     }
-    await res.revalidate('/item');
+    // await res.revalidate('/item');
     return res.json({ revalidated: true });
 }

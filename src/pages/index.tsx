@@ -9,7 +9,13 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import ChartHome from '@/components/ChartHome';
 import { prisma } from '../../db/client';
-import { GetStaticProps, InferGetStaticPropsType, NextPage } from 'next';
+import {
+    GetServerSideProps,
+    GetStaticProps,
+    InferGetServerSidePropsType,
+    InferGetStaticPropsType,
+    NextPage,
+} from 'next';
 import { Prisma } from '@prisma/client';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -51,7 +57,7 @@ async function getItem() {
     return data;
 }
 
-export const getStaticProps: GetStaticProps<{
+export const getServerSideProps: GetServerSideProps<{
     totalWarehouse: Prisma.PromiseReturnType<typeof getWarehouseSum>;
     incomingSum: Prisma.PromiseReturnType<typeof getIncomingSum>;
     outgoingItem: Prisma.PromiseReturnType<typeof getOutgoingSum>;
@@ -73,8 +79,8 @@ export const getStaticProps: GetStaticProps<{
     };
 };
 
-const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (
-    props: InferGetStaticPropsType<typeof getStaticProps>
+const Home: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
+    props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) => {
     const router = useRouter();
     const [windowWidth, setWindowWidth] = useState<number>(0);
