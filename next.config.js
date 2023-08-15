@@ -3,7 +3,7 @@ const nextConfig = {
     reactStrictMode: true,
     modularizeImports: {
         'lucide-react': {
-            transform: 'lucide-react/dist/esm/icons/{{member}}',
+            transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
         },
     },
 };
