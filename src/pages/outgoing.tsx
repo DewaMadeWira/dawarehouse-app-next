@@ -231,6 +231,7 @@ const Outgoing: NextPage<
             //         );
             //     })
             // );
+
             refreshData();
         }
     }
@@ -277,6 +278,10 @@ const Outgoing: NextPage<
             setQuantityState('');
             refreshData();
             setData(props.outgoingItems);
+            toast({
+                description: 'Data Created  !',
+                className: 'bg-green p-5 font-outfit border-none ',
+            });
         }
     }
 

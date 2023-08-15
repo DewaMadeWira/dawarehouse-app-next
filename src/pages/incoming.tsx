@@ -220,6 +220,7 @@ const Incoming: NextPage<
             //         );
             //     })
             // );
+           
             refreshData();
         }
     }
@@ -258,6 +259,10 @@ const Incoming: NextPage<
             setQuantityState('');
             refreshData();
             setData(props.incomingItems);
+             toast({
+                 description: 'Data Created  !',
+                 className: 'bg-green p-5 font-outfit border-none ',
+             });
         }
     }
 
