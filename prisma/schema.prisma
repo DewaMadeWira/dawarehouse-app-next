@@ -12,7 +12,7 @@ model incoming_item_table {
   warehouse_id           Int
   incoming_item_quantity Int
   incoming_item_date     DateTime        @default(now())
-  warehouse_table        warehouse_table @relation(fields: [warehouse_id], references: [warehouse_id], onUpdate: Restrict, map: "incoming_item_table_ibfk_1")
+  warehouse_table        warehouse_table? @relation(fields: [warehouse_id], references: [warehouse_id], onUpdate: Restrict, map: "incoming_item_table_ibfk_1")
 
   @@index([warehouse_id], map: "warehouse_id")
 }
@@ -30,7 +30,7 @@ model outgoing_item_table {
   warehouse_id           Int
   outgoing_item_quantity Int
   outgoing_item_date     DateTime?       @default(now())
-  warehouse_table        warehouse_table @relation(fields: [warehouse_id], references: [warehouse_id], onUpdate: Restrict, map: "outgoing_item_table_ibfk_1")
+  warehouse_table        warehouse_table? @relation(fields: [warehouse_id], references: [warehouse_id], onUpdate: Restrict, map: "outgoing_item_table_ibfk_1")
 
   @@index([warehouse_id], map: "warehouse_id_fk")
 }
@@ -42,7 +42,7 @@ model warehouse_table {
   status              String?
   incoming_item_table incoming_item_table[]
   outgoing_item_table outgoing_item_table[]
-  item_table          item_table            @relation(fields: [item_id], references: [item_id], onUpdate: Restrict, map: "warehouse_table_ibfk_1")
+  item_table          item_table?            @relation(fields: [item_id], references: [item_id], onUpdate: Restrict, map: "warehouse_table_ibfk_1")
 
   @@index([item_id], map: "item_id")
 }

@@ -18,9 +18,18 @@ export default async function handler(
             //             SET foreign_key_checks = 0;
             // DELETE FROM item_table WHERE item_id=35;
             // SET foreign_key_checks = 1;
-            await prisma.$queryRaw`SET foreign_key_checks = 0`;
+            // await prisma.$queryRaw`SET foreign_key_checks = 0`;
+            // await prisma.$queryRaw`DELETE FROM item_table WHERE item_id=${id}`;
+            // await prisma.$queryRaw`SET foreign_key_checks = 1`;
+            // await prisma.outgoing_item_table.deleteMany({
+            //     include:{
+
+            //     }
+            // })
+
+            // await prisma.$queryRaw`ALTER TABLE item_table DISABLE TRIGGER ALL`;
             await prisma.$queryRaw`DELETE FROM item_table WHERE item_id=${id}`;
-            await prisma.$queryRaw`SET foreign_key_checks = 1`;
+            // await prisma.$queryRaw`ALTER TABLE item_table ENABLE TRIGGER ALL`;
         } catch (error) {
             console.log(error);
             res.status(400);
