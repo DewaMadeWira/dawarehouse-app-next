@@ -433,8 +433,8 @@ const Outgoing: NextPage<
                                                                 {
                                                                     prop
                                                                         .warehouse_table
-                                                                        .item_table
-                                                                        .item_name
+                                                                        ?.item_table
+                                                                        ?.item_name
                                                                 }
                                                             </TableCell>
                                                             <TableCell className=''>
@@ -497,7 +497,7 @@ const Outgoing: NextPage<
                                                                                 {
                                                                                     prop
                                                                                         .warehouse_table
-                                                                                        .warehouse_quantity
+                                                                                        ?.warehouse_quantity
                                                                                 }
                                                                             </p>
                                                                             <label
@@ -658,8 +658,8 @@ const Outgoing: NextPage<
                                                                     <h4 className='font-bold'>
                                                                         {
                                                                             prop
-                                                                                .item_table
-                                                                                .item_name
+                                                                                ?.item_table
+                                                                                ?.item_name
                                                                         }
                                                                     </h4>
                                                                     <p>
@@ -729,20 +729,26 @@ const Outgoing: NextPage<
                             />
                         </div>
                         <div className='w-full mt-10 flex flex-col gap-7'>
-                            {data?.map((prop) => (
-                                <CardWarehouse
-                                    key={
-                                        prop.warehouse_table.item_table
-                                            .item_name
-                                    }
-                                    name={
-                                        prop.warehouse_table.item_table
-                                            .item_name
-                                    }
-                                    quantity={prop.outgoing_item_quantity.toString()}
-                                    // status={prop.status?.toString()}
-                                ></CardWarehouse>
-                            ))}
+                            {data?.map((prop) =>
+                                prop.warehouse_table != null ? (
+                                    <CardWarehouse
+                                        key={
+                                            prop.warehouse_table.item_table?.item_name
+                                        }
+                                        name={
+                                            prop.warehouse_table?.item_table !=
+                                            null
+                                                ? prop.warehouse_table
+                                                      ?.item_table.item_name
+                                                : ''
+                                        }
+                                        quantity={prop.outgoing_item_quantity.toString()}
+                                        // status={prop.status?.toString()}
+                                    ></CardWarehouse>
+                                ) : (
+                                    ''
+                                )
+                            )}
                         </div>
                     </div>
                 </>

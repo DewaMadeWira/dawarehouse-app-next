@@ -121,6 +121,7 @@ async function getItem() {
 }
 
 export const getServerSideProps: GetServerSideProps<{
+    [x: string]: any;
     incomingItems: Prisma.PromiseReturnType<typeof getIncomingItems>;
     totalWarehouse: Prisma.PromiseReturnType<typeof getWarehouseSum>;
     incomingSum: Prisma.PromiseReturnType<typeof getIncomingSum>;
@@ -194,7 +195,10 @@ const Incoming: NextPage<
     }, []);
 
     useEffect(() => {
-        setData(props.incomingItems);
+        const filteredData = props.incomingItems.filter(
+            (item) => item !== null && item !== undefined
+        );
+        setData(filteredData);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     });
 
@@ -220,7 +224,7 @@ const Incoming: NextPage<
             //         );
             //     })
             // );
-           
+
             refreshData();
         }
     }
@@ -259,10 +263,10 @@ const Incoming: NextPage<
             setQuantityState('');
             refreshData();
             setData(props.incomingItems);
-             toast({
-                 description: 'Data Created  !',
-                 className: 'bg-green p-5 font-outfit border-none ',
-             });
+            toast({
+                description: 'Data Created  !',
+                className: 'bg-green p-5 font-outfit border-none ',
+            });
         }
     }
 
@@ -397,7 +401,7 @@ const Incoming: NextPage<
                                                             </TableCell>
                                                             <TableCell className=''>
                                                                 {
-                                                                    prop
+                                                                    props
                                                                         .warehouse_table
                                                                         .item_table
                                                                         .item_name
@@ -659,20 +663,24 @@ const Incoming: NextPage<
                             />
                         </div>
                         <div className='w-full mt-10 flex flex-col gap-7'>
-                            {data?.map((prop) => (
-                                <CardWarehouse
-                                    key={
-                                        prop.warehouse_table.item_table
-                                            .item_name
-                                    }
-                                    name={
-                                        prop.warehouse_table.item_table
-                                            .item_name
-                                    }
-                                    quantity={prop.incoming_item_quantity.toString()}
-                                    // status={prop.status?.toString()}
-                                ></CardWarehouse>
-                            ))}
+                            {data?.map((prop) =>
+                                prop.warehouse_table != null ? (
+                                    <CardWarehouse
+                                        key={
+                                            prop.warehouse_table.item_table
+                                                ?.item_name
+                                        }
+                                        name={
+                                            prop.warehouse_table?.item_table!=null?(prop.warehouse_table?.item_table.item_name):("")
+                                            
+                                        }
+                                        quantity={prop.incoming_item_quantity.toString()}
+                                        // status={prop.status?.toString()}
+                                    ></CardWarehouse>
+                                ) : (
+                                    ''
+                                )
+                            )}
                         </div>
                     </div>
                 </>
