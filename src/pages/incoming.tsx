@@ -388,7 +388,7 @@ const Incoming: NextPage<
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
-                                                    {data?.map((prop) => (
+                                                    {data?.map((prop?) => (
                                                         <TableRow
                                                             key={
                                                                 prop.incoming_item_id
@@ -401,10 +401,10 @@ const Incoming: NextPage<
                                                             </TableCell>
                                                             <TableCell className=''>
                                                                 {
-                                                                    props
-                                                                        .warehouse_table
-                                                                        .item_table
-                                                                        .item_name
+                                                                    prop
+                                                                        ?.warehouse_table
+                                                                        ?.item_table
+                                                                        ?.item_name
                                                                 }
                                                             </TableCell>
                                                             <TableCell className=''>
@@ -671,8 +671,11 @@ const Incoming: NextPage<
                                                 ?.item_name
                                         }
                                         name={
-                                            prop.warehouse_table?.item_table!=null?(prop.warehouse_table?.item_table.item_name):("")
-                                            
+                                            prop.warehouse_table?.item_table !=
+                                            null
+                                                ? prop.warehouse_table
+                                                      ?.item_table.item_name
+                                                : ''
                                         }
                                         quantity={prop.incoming_item_quantity.toString()}
                                         // status={prop.status?.toString()}
